@@ -4,7 +4,7 @@ import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useLesson } from "@/hooks/use-lesson"
 
-import { AnswerOptions } from "./answer-options"
+import { ExerciseRenderer } from "./exercise-renderer"
 import { ContinueButton } from "./continue-button"
 import { FeedbackBar } from "./feedback-bar"
 import { LessonHeader } from "./lesson-header"
@@ -68,19 +68,19 @@ export function LessonView({ lessonId }: LessonViewProps) {
           {currentQuestion.question}
         </h1>
 
-        {currentQuestion.type === "MULTIPLE_CHOICE" && (
-          <AnswerOptions
-            options={currentQuestion.payload.options}
-            selectedId={selectedAnswer}
-            correctAnswerId={currentQuestion.payload.correctAnswerId}
-            answerState={answerState}
-            onSelect={selectAnswer}
-          />
-        )}
+        <ExerciseRenderer 
+          exercise={currentQuestion}
+          selectedAnswer={selectedAnswer}
+          answerState={answerState}
+          onSelect={selectAnswer}
+        />
       </div>
 
       {questionStatus !== "submitted" && (
-        <ContinueButton disabled={!selectedAnswer} onClick={submitAnswer} />
+        <ContinueButton 
+          disabled={selectedAnswer === null || selectedAnswer === "" || (Array.isArray(selectedAnswer) && selectedAnswer.length === 0)} 
+          onClick={submitAnswer} 
+        />
       )}
 
       {questionStatus === "submitted" && (

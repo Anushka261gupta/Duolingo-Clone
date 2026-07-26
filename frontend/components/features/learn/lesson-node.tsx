@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { Check, Crown, Dumbbell, Lock, Star } from "lucide-react"
 
 import type { LessonNodeProps, NodeKind, NodeState } from "@/domain/types"
@@ -39,25 +40,44 @@ export function LessonNode({
   progress = 0,
   offset = 0,
   showStart = false,
+  href,
 }: LessonNodeProps) {
   const { face, edge, ink } = nodeColors(state)
   const isCurrent = state === "current"
+
+  const NodeContent = (
+    <span className="transition-transform duration-100 group-hover:scale-110">
+      <NodeIcon state={state} kind={kind} />
+    </span>
+  )
+
+  const buttonClasses = `group flex size-[74px] items-center justify-center rounded-full ${face} ${edge} ${ink} transition-transform duration-100 active:translate-y-1 active:shadow-none`
 
   return (
     <div className="relative flex flex-col items-center" style={{ transform: `translateX(${offset}px)` }}>
       {showStart && (
         <div className="animate-duo-bounce absolute -top-12 z-20 select-none">
-          <div className="relative rounded-2xl border-2 border-duo-gray-light bg-background px-4 py-1.5 shadow-sm">
-            <span className="text-sm font-extrabold uppercase tracking-wide text-duo-green">Start</span>
-            <span className="absolute -bottom-[9px] left-1/2 size-3.5 -translate-x-1/2 rotate-45 border-b-2 border-r-2 border-duo-gray-light bg-background" />
-          </div>
+          {href ? (
+            <Link
+              href={href}
+              className="relative block rounded-2xl border-2 border-duo-gray-light bg-background px-4 py-1.5 shadow-sm transition-transform active:scale-95 active:shadow-none"
+            >
+              <span className="text-sm font-extrabold uppercase tracking-wide text-duo-green">Start</span>
+              <span className="absolute -bottom-[9px] left-1/2 size-3.5 -translate-x-1/2 rotate-45 border-b-2 border-r-2 border-duo-gray-light bg-background" />
+            </Link>
+          ) : (
+            <div className="relative rounded-2xl border-2 border-duo-gray-light bg-background px-4 py-1.5 shadow-sm">
+              <span className="text-sm font-extrabold uppercase tracking-wide text-duo-green">Start</span>
+              <span className="absolute -bottom-[9px] left-1/2 size-3.5 -translate-x-1/2 rotate-45 border-b-2 border-r-2 border-duo-gray-light bg-background" />
+            </div>
+          )}
         </div>
       )}
 
       <div className="relative flex items-center justify-center" style={{ width: RING_SIZE, height: RING_SIZE }}>
         {isCurrent && (
           <svg
-            className="absolute inset-0 -rotate-90"
+            className="absolute inset-0 -rotate-90 pointer-events-none"
             width={RING_SIZE}
             height={RING_SIZE}
             viewBox={`0 0 ${RING_SIZE} ${RING_SIZE}`}
@@ -78,15 +98,17 @@ export function LessonNode({
           </svg>
         )}
 
-        <button
-          className={`group flex size-[74px] items-center justify-center rounded-full ${face} ${edge} ${ink} transition-transform duration-100 active:translate-y-1 active:shadow-none`}
-          aria-label={`${state} lesson`}
-        >
-          <span className="transition-transform duration-100 group-hover:scale-110">
-            <NodeIcon state={state} kind={kind} />
-          </span>
-        </button>
+        {href ? (
+          <Link href={href} className={buttonClasses} aria-label={`${state} lesson`}>
+            {NodeContent}
+          </Link>
+        ) : (
+          <button className={buttonClasses} aria-label={`${state} lesson`}>
+            {NodeContent}
+          </button>
+        )}
       </div>
     </div>
   )
 }
+
