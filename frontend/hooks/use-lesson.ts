@@ -2,8 +2,11 @@ import { useState } from "react"
 import { QuestionStatus, LessonMetadata, UserAnswer } from "@/domain/types/lesson-engine"
 import { MOCK_LESSONS } from "@/data/lesson-engine"
 import { validateExerciseAnswer } from "@/domain/utils/exercise-validators"
+import { useHearts } from "@/providers/hearts-provider"
 
 export function useLesson(lessonId: string) {
+  const { loseHeart, isOutOfHearts, hearts } = useHearts()
+  
   // Fallback to "fallback-lesson" only if the requested lesson doesn't exist
   const lessonData = MOCK_LESSONS[lessonId] || MOCK_LESSONS["fallback-lesson"]
   
@@ -18,6 +21,7 @@ export function useLesson(lessonId: string) {
   const [questionStatus, setQuestionStatus] = useState<QuestionStatus>("idle")
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
   const [lessonCompleted, setLessonCompleted] = useState(false)
+  const [gameOver, setGameOver] = useState(false)
   
   // Track correct answers for accuracy metadata
   const [correctCount, setCorrectCount] = useState(0)
@@ -41,6 +45,8 @@ export function useLesson(lessonId: string) {
 
     if (correct) {
       setCorrectCount(prev => prev + 1)
+    } else {
+      loseHeart()
     }
 
     setIsCorrect(correct)
@@ -48,6 +54,11 @@ export function useLesson(lessonId: string) {
   }
 
   const nextQuestion = () => {
+    if (isOutOfHearts) {
+      setGameOver(true)
+      return
+    }
+
     if (!lessonData) return
 
     const nextIndex = currentIndex + 1
@@ -70,7 +81,7 @@ export function useLesson(lessonId: string) {
         lessonId,
         completedAt: new Date().toISOString(),
         accuracy: correctCount / lessonData.questions.length,
-        heartsRemaining: 5, // Hearts not implemented in this iteration
+        heartsRemaining: hearts, 
         xpEarned: 15        // Static XP for now
       }
       
@@ -92,6 +103,7 @@ export function useLesson(lessonId: string) {
     setQuestionStatus("idle")
     setIsCorrect(null)
     setLessonCompleted(false)
+    setGameOver(false)
     setCorrectCount(0)
   }
 
@@ -103,6 +115,7 @@ export function useLesson(lessonId: string) {
     isCorrect,
     progress,
     lessonCompleted,
+    gameOver,
     totalQuestions: lessonData?.questions.length || 0,
     selectAnswer,
     submitAnswer,

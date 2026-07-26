@@ -4,6 +4,7 @@ import { Nunito } from 'next/font/google'
 
 import { siteConfig } from '@/config/site'
 import { AuthProvider } from '@/providers/auth-provider'
+import { HeartsProvider } from '@/providers/hearts-provider'
 
 import './globals.css'
 
@@ -53,8 +54,10 @@ export default function RootLayout({
     <html lang="en" className={`${nunito.variable} bg-background`}>
       <body className="font-sans antialiased">
         <AuthProvider>
-          {children}
-          {process.env.NODE_ENV === 'production' && <Analytics />}
+          <HeartsProvider>
+            {children}
+            {process.env.NODE_ENV === 'production' && <Analytics />}
+          </HeartsProvider>
         </AuthProvider>
       </body>
     </html>

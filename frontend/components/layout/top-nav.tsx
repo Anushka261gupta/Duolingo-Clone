@@ -5,7 +5,11 @@ import { Flame, Gem, Heart } from "lucide-react"
 import { CourseFlag, StatBadge } from "@/components/shared"
 import { MAIN_NAV_ITEMS } from "@/domain/constants/navigation"
 
+import { useHearts } from "@/providers/hearts-provider"
+
 export function TopNav() {
+  const { hearts } = useHearts()
+  
   return (
     <header className="sticky top-0 z-50 border-b-2 border-duo-gray-light bg-background/95 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 md:px-6">
@@ -58,7 +62,7 @@ export function TopNav() {
           />
           <StatBadge
             icon={<Heart className="size-6 fill-duo-red text-duo-red" strokeWidth={0} />}
-            value={5}
+            value={hearts}
             color="text-duo-red"
             label="Hearts"
           />

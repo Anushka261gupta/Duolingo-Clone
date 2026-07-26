@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useLesson } from "@/hooks/use-lesson"
 
@@ -8,6 +8,8 @@ import { ExerciseRenderer } from "./exercise-renderer"
 import { ContinueButton } from "./continue-button"
 import { FeedbackBar } from "./feedback-bar"
 import { LessonHeader } from "./lesson-header"
+import { OutOfHearts } from "./out-of-hearts"
+import { useHearts } from "@/providers/hearts-provider"
 
 interface LessonViewProps {
   lessonId: string
@@ -22,6 +24,7 @@ export function LessonView({ lessonId }: LessonViewProps) {
     questionStatus,
     isCorrect,
     lessonCompleted,
+    gameOver,
     totalQuestions,
     selectAnswer,
     submitAnswer,
@@ -34,17 +37,24 @@ export function LessonView({ lessonId }: LessonViewProps) {
     }
   }, [lessonCompleted, router])
 
+  const { hearts, maxHearts, isOutOfHearts } = useHearts()
+  const [hasMounted, setHasMounted] = useState(false)
+
+  useEffect(() => {
+    setHasMounted(true)
+  }, [])
+
   if (!currentQuestion) return null
   if (lessonCompleted) return null
-
+  if (gameOver || (hasMounted && isOutOfHearts && currentIndex === 0 && questionStatus === "idle")) {
+    return <OutOfHearts />
+  }
   let answerState: "idle" | "selected" | "correct" | "incorrect" = "idle"
   if (questionStatus === "selected") answerState = "selected"
   if (questionStatus === "submitted") {
     answerState = isCorrect ? "correct" : "incorrect"
   }
 
-  // Hearts logic removed from this iteration
-  const hearts = 5
   const heartAnimating = false
 
   return (
@@ -53,7 +63,7 @@ export function LessonView({ lessonId }: LessonViewProps) {
         currentQuestion={currentIndex + 1}
         totalQuestions={totalQuestions}
         hearts={hearts}
-        maxHearts={5}
+        maxHearts={maxHearts}
         heartAnimating={heartAnimating}
       />
 
