@@ -1,0 +1,7 @@
+export { LessonCompleteView } from "./lesson-complete-view"
+export { XpAwardCard } from "./xp-award-card"
+export { StatsGrid } from "./stats-grid"
+export { AchievementSection } from "./achievement-section"
+export { ContinueFooter } from "./continue-footer"
+export { IllustrationPlaceholder } from "./illustration-placeholder"
+export { ConfettiPlaceholder } from "./confetti-placeholder"

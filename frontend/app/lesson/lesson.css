@@ -1,0 +1,78 @@
+@keyframes lesson-slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes lesson-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes lesson-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20%,
+  60% {
+    transform: translateX(-6px);
+  }
+  40%,
+  80% {
+    transform: translateX(6px);
+  }
+}
+
+@keyframes lesson-heart-pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.25);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes lesson-progress-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+.animate-lesson-slide-up {
+  animation: lesson-slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-lesson-fade-in {
+  animation: lesson-fade-in 0.45s ease-out both;
+}
+
+.animate-lesson-shake {
+  animation: lesson-shake 0.45s ease-in-out;
+}
+
+.animate-lesson-heart-pop {
+  animation: lesson-heart-pop 0.35s ease-out;
+}
+
+.animate-lesson-progress-pulse {
+  animation: lesson-progress-pulse 0.6s ease-in-out;
+}

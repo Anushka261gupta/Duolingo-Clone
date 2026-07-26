@@ -1,0 +1,85 @@
+import { useState } from "react"
+import { useAuthContext } from "@/providers/auth-provider"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { FormError } from "./form-error"
+import { Eye, EyeOff, Loader2 } from "lucide-react"
+
+export function LoginForm() {
+  const { login, isLoading } = useAuthContext()
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
+  const [errors, setErrors] = useState<{ email?: string; password?: string; global?: string }>({})
+
+  const validate = () => {
+    const newErrors: typeof errors = {}
+    if (!email) newErrors.email = "Email is required"
+    else if (!/^\S+@\S+\.\S+$/.test(email)) newErrors.email = "Please enter a valid email"
+    
+    if (!password) newErrors.password = "Password is required"
+    
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!validate()) return
+
+    const res = await login({ email, password })
+    if (res.error) {
+      setErrors({ global: res.error })
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      {errors.global && (
+        <div className="rounded-xl border-2 border-rose-500/20 bg-rose-500/10 p-4 text-center font-bold text-rose-500">
+          {errors.global}
+        </div>
+      )}
+
+      <div>
+        <Input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          disabled={isLoading}
+        />
+        <FormError message={errors.email} />
+      </div>
+
+      <div className="relative">
+        <Input
+          type={showPassword ? "text" : "password"}
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          disabled={isLoading}
+          className="pr-12"
+        />
+        <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          className="absolute right-4 top-3.5 text-duo-gray hover:text-foreground"
+          disabled={isLoading}
+        >
+          {showPassword ? <EyeOff className="size-5" /> : <Eye className="size-5" />}
+        </button>
+        <FormError message={errors.password} />
+      </div>
+
+      <Button
+        type="submit"
+        size="lg"
+        className="mt-2 w-full font-extrabold uppercase tracking-wide"
+        disabled={isLoading}
+      >
+        {isLoading ? <Loader2 className="size-5 animate-spin" /> : "Log In"}
+      </Button>
+    </form>
+  )
+}
