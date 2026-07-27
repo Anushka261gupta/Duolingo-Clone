@@ -331,20 +331,44 @@ http://localhost:8000/docs
 
 ---
 
-# Screenshots
+# 📸 Screenshots
 
-Replace these with actual screenshots.
+## 🏠 Home Page
 
-- Home Page
-- Learning Path
-- Lesson Player
-- Leaderboard
-- Profile
-- Shop
-- Quests
-- Achievements
+![Home Page](./screenshots/Homepage.png)
 
 ---
+
+## 📚 Lesson Player
+
+![Lesson Player](./screenshots/lesson.png)
+
+---
+
+## 🏆 Leaderboard
+
+![Leaderboard](./screenshots/Leaderboard.png)
+
+---
+
+## 👤 Profile
+
+![Profile](./screenshots/Profile.png)
+
+---
+
+## 🛍️ Shop
+
+![Shop](./screenshots/Shop.png)
+
+---
+
+## 🎯 Quests
+
+![Quests](./screenshots/Quest.png)
+
+---
+
 
 # Assumptions
 
