@@ -341,31 +341,31 @@ http://localhost:8000/docs
 
 ## 📚 Lesson Player
 
-![Lesson Player](./screenshots/lesson.png)
+![Lesson Player](./Screenshot/lesson.png)
 
 ---
 
 ## 🏆 Leaderboard
 
-![Leaderboard](./screenshots/Leaderboard.png)
+![Leaderboard](./Screenshot/Leaderboard.png)
 
 ---
 
 ## 👤 Profile
 
-![Profile](./screenshots/Profile.png)
+![Profile](./Screenshot/Profile.png)
 
 ---
 
 ## 🛍️ Shop
 
-![Shop](./screenshots/Shop.png)
+![Shop](./Screenshot/Shop.png)
 
 ---
 
 ## 🎯 Quests
 
-![Quests](./screenshots/Quest.png)
+![Quests](./Screenshot/Quest.png)
 
 ---
 
