@@ -1,6 +1,7 @@
 "use client"
 
 import { ChevronRight, Trophy, Loader2 } from "lucide-react"
+import Link from "next/link"
 
 import { DuoCard } from "@/components/shared"
 import { useLeaderboard } from "@/hooks/use-leaderboard"
@@ -15,12 +16,13 @@ export function LeaderboardPreview() {
           <Trophy className="size-5 fill-duo-gold text-duo-gold" strokeWidth={0} />
           <h3 className="text-lg font-extrabold text-duo-ink">Gold League</h3>
         </div>
-        <button
+        <Link
+          href="/leaderboards"
           className="flex items-center text-sm font-bold uppercase tracking-wide text-duo-blue hover:opacity-80"
           aria-label="View leaderboard"
         >
           View <ChevronRight className="size-4" strokeWidth={3} />
-        </button>
+        </Link>
       </div>
       
       {isLoading || !data ? (

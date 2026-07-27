@@ -19,14 +19,46 @@ export function useLesson(lessonId: string, mode: "learn" | "practice" = "learn"
   const { generatedLesson } = usePractice()
   const { markLessonCompleted, markPracticeCompleted } = useProgress()
   
+  const [lessonData, setLessonData] = useState<any>(null)
+  
   useEffect(() => {
     resetLessonXP()
   }, [lessonId, mode])
 
-  // Fallback to "fallback-lesson" only if the requested lesson doesn't exist
-  const lessonData = mode === "practice" 
-    ? generatedLesson 
-    : (MOCK_LESSONS[lessonId] || MOCK_LESSONS["fallback-lesson"])
+  useEffect(() => {
+    let mounted = true
+    if (mode === "practice") {
+      setLessonData(generatedLesson)
+      return
+    }
+    
+    fetch(`http://localhost:8000/api/v1/lessons/${lessonId}`)
+      .then(res => {
+        if (!res.ok) throw new Error("Not found")
+        return res.json()
+      })
+      .then(data => {
+        if (!mounted) return
+        // Transform backend exercises directly back into frontend shape
+        const questions = data.exercises.map((ex: any) => ({
+          id: ex.id,
+          type: ex.type,
+          prompt: ex.hint,
+          question: ex.question,
+          payload: ex.payload
+        }))
+        setLessonData({
+          id: data.id,
+          questions
+        })
+      })
+      .catch(() => {
+        if (!mounted) return
+        setLessonData(MOCK_LESSONS[lessonId] || MOCK_LESSONS["fallback-lesson"])
+      })
+      
+    return () => { mounted = false }
+  }, [lessonId, mode, generatedLesson])
   
   const [currentIndex, setCurrentIndex] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState<UserAnswer>(null)
@@ -38,6 +70,7 @@ export function useLesson(lessonId: string, mode: "learn" | "practice" = "learn"
   // Track correct answers for accuracy metadata
   const [correctCount, setCorrectCount] = useState(0)
   const [incorrectCount, setIncorrectCount] = useState(0)
+  const [sessionXP, setSessionXP] = useState(0)
 
   const currentQuestion = lessonData?.questions[currentIndex]
   
@@ -60,7 +93,7 @@ export function useLesson(lessonId: string, mode: "learn" | "practice" = "learn"
       setCorrectCount(prev => prev + 1)
       const baseRaw = mode === "practice" ? PRACTICE_CONFIG.QUESTION_XP : (XP_REWARDS.EXERCISE_BASE[currentQuestion.type] || 5)
       const xp = isDoubleXPActive ? baseRaw * 2 : baseRaw
-      addXP(xp, isDoubleXPActive)
+      setSessionXP(prev => prev + xp)
       
       // If practice mode and correct, we can remove it from mistakes
       if (mode === "practice") {
@@ -75,6 +108,15 @@ export function useLesson(lessonId: string, mode: "learn" | "practice" = "learn"
       }
     } else {
       setIncorrectCount(prev => prev + 1)
+      
+      // Append the failed question to the end of the lesson so the user must retry it
+      if (lessonData) {
+        setLessonData((prev: any) => ({
+          ...prev,
+          questions: [...prev.questions, { ...currentQuestion, id: `${currentQuestion.id}-retry-${Date.now()}` }]
+        }))
+      }
+
       if (mode === "learn") {
         loseHeart()
         // Record mistake for future practice
@@ -130,8 +172,13 @@ export function useLesson(lessonId: string, mode: "learn" | "practice" = "learn"
       const base = isDoubleXPActive ? baseRaw * 2 : baseRaw
       const perfectBonus = isDoubleXPActive ? perfectBonusRaw * 2 : perfectBonusRaw
       
+      // Award all accumulated session XP only upon successful completion
+      if (sessionXP > 0) {
+        addXP(sessionXP, isDoubleXPActive)
+      }
+      
       commitLessonRewards({ base, perfectBonus })
-      const finalXP = currentLessonXP + base + perfectBonus
+      const finalXP = sessionXP + base + perfectBonus
 
       const newMetadata: LessonMetadata = {
         lessonId: mode === "practice" ? "practice-lesson" : lessonId,
@@ -141,8 +188,8 @@ export function useLesson(lessonId: string, mode: "learn" | "practice" = "learn"
         xpEarned: finalXP,
         xpBreakdown: {
           baseLesson: baseRaw + perfectBonusRaw,
-          exercise: currentLessonXP / (isDoubleXPActive ? 2 : 1),
-          doubleXpBonus: isDoubleXPActive ? ((currentLessonXP / 2) + baseRaw + perfectBonusRaw) : 0,
+          exercise: sessionXP / (isDoubleXPActive ? 2 : 1),
+          doubleXpBonus: isDoubleXPActive ? ((sessionXP / 2) + baseRaw + perfectBonusRaw) : 0,
           total: finalXP
         },
         correctAnswers: correctCount,
@@ -172,6 +219,7 @@ export function useLesson(lessonId: string, mode: "learn" | "practice" = "learn"
     setGameOver(false)
     setCorrectCount(0)
     setIncorrectCount(0)
+    setSessionXP(0)
     resetLessonXP()
   }
 

@@ -16,10 +16,15 @@ export function useLeaderboard() {
       ).sort((a: any, b: any) => b.xp - a.xp)
     }
     
-    mergedData.entries = mergedData.entries.map((entry, index) => ({
-      ...entry,
-      rank: index + 1
-    }))
+    mergedData.entries = mergedData.entries.map((entry, index) => {
+      const rank = index + 1;
+      return {
+        ...entry,
+        rank,
+        color: rank === 1 ? "text-[#ffc800]" : rank <= 3 ? "text-[#afafaf]" : entry.you ? "text-[#cd7f32]" : "text-foreground",
+        medal: rank === 1 ? "bg-[#ffc800]" : rank === 2 ? "bg-[#afafaf]" : rank === 3 ? "bg-[#cd7f32]" : "bg-transparent",
+      }
+    })
 
     return mergedData
   }, [fetchedData, weeklyXP])

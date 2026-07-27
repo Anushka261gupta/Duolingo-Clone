@@ -1,6 +1,7 @@
 "use client"
 
 import { Gift } from "lucide-react"
+import Link from "next/link"
 
 import { DuoCard, ProgressBar } from "@/components/shared"
 import { MOCK_DAILY_QUESTS } from "@/data/quests"
@@ -13,9 +14,9 @@ export function DailyQuests() {
     <DuoCard>
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-lg font-extrabold text-duo-ink">Daily Quests</h3>
-        <button className="text-sm font-bold uppercase tracking-wide text-duo-blue hover:opacity-80">
+        <Link href="/quests" className="text-sm font-bold uppercase tracking-wide text-duo-blue hover:opacity-80">
           View all
-        </button>
+        </Link>
       </div>
       <div className="flex flex-col gap-4">
         {MOCK_DAILY_QUESTS.map((q) => {

@@ -17,7 +17,10 @@ export function useShopCatalog() {
         
         // Merge backend price/availability into frontend UI config
         const merged = MOCK_SHOP_ITEMS.map(mockItem => {
-          const backendItem = items.find(i => i.id === mockItem.id)
+          // Attempt to match IDs like item_heart_refill with shop-heart-refill
+          const searchId = mockItem.id.replace("item_", "shop-").replace(/_/g, "-")
+          const backendItem = items.find(i => i.id === searchId || i.id === mockItem.id)
+          
           if (backendItem) {
             return {
               ...mockItem,

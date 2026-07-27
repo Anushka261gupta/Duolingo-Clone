@@ -18,18 +18,35 @@ export function useLeaderboardData() {
         if (!mounted) return
         
         // Map backend users to frontend leaderboard entries format
-        const entries = users.map((u, i) => ({
-          id: u.id,
-          name: u.username,
-          avatar: u.avatar || `https://i.pravatar.cc/150?u=${u.id}`,
-          xp: u.weekly_xp,
-          you: u.username === "demo",
-          rank: i + 1,
-          trend: i % 2 === 0 ? "up" : "down" // Mock trend since not in DB
-        }))
+        const entries = users.map((u, i) => {
+          const rank = i + 1;
+          const isYou = u.username === "demo";
+          
+          let zone: "promotion" | "demotion" | "safe" = "safe";
+          if (rank <= 7) zone = "promotion";
+          else if (rank >= 25) zone = "demotion";
+          
+          return {
+            id: u.id,
+            name: isYou ? "You" : u.username,
+            avatarUrl: isYou ? "https://github.com/shadcn.png" : (u.avatar || undefined),
+            xp: u.weekly_xp,
+            you: isYou,
+            rank,
+            trend: i % 2 === 0 ? "up" : "down", // Mock trend since not in DB
+            zone,
+            color: rank === 1 ? "text-[#ffc800]" : rank <= 3 ? "text-[#afafaf]" : isYou ? "text-[#cd7f32]" : "text-foreground",
+            medal: rank === 1 ? "bg-[#ffc800]" : rank === 2 ? "bg-[#afafaf]" : rank === 3 ? "bg-[#cd7f32]" : "bg-transparent",
+          }
+        })
         
         setData({
-          league: "Sapphire League",
+          league: {
+            name: "Gold League",
+            icon: "🏆",
+            color: "text-duo-gold",
+          },
+          resetDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
           entries,
           promotionCutoff: 10,
           demotionCutoff: 25

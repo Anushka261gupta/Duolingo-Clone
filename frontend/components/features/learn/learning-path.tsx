@@ -90,7 +90,7 @@ export function LearningPath() {
                     showStart={isCurrent}
                     href={href}
                   />
-                  {node.mascot && isCurrent && (
+                  {isCurrent && (
                     <div
                       className="animate-duo-pop absolute top-1/2 hidden -translate-y-1/2 sm:block"
                       style={{ left: `calc(50% + ${offset + 96}px)` }}

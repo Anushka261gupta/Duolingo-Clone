@@ -6,6 +6,7 @@ class ExerciseType(str, enum.Enum):
     MATCH_PAIRS = "MATCH_PAIRS"
     FILL_BLANK = "FILL_BLANK"
     TYPE_ANSWER = "TYPE_ANSWER"
+    TRANSLATE = "TRANSLATE"
 
 class QuestType(str, enum.Enum):
     XP = "XP"

@@ -22,22 +22,52 @@ export function useCourse(courseId: string) {
         setData(course)
         
         // Map backend format to MOCK_UNITS UI format
-        const colors = ["bg-green-500", "bg-purple-500", "bg-blue-500"]
-        const edges = ["border-green-600", "border-purple-600", "border-blue-600"]
+        const legacyStyles = [
+          { section: "Section 2", unit: "Unit 4", color: "bg-duo-green", edge: "shadow-[0_4px_0_0_#58a700]", kinds: ["star", "star", "trophy", "star", "star", "practice", "star"] },
+          { section: "Section 2", unit: "Unit 5", color: "bg-duo-blue", edge: "shadow-[0_4px_0_0_#1899d6]", kinds: ["star", "star", "trophy", "trophy"] },
+          { section: "Section 2", unit: "Unit 6", color: "bg-purple-500", edge: "border-purple-600", kinds: ["star", "star"] }
+        ]
         
         const mapped = course.units.map((unit, index) => {
-          const colorIdx = index % colors.length
+          const style = legacyStyles[index % legacyStyles.length]
+          
+          // Generate nodes based on backend skills, but padded/styled to match legacy
+          const nodes: any[] = []
+          let nodeIdx = 0
+          
+          // For each skill, let's create a few nodes so the path looks long enough
+          unit.skills.forEach((skill) => {
+             nodes.push({
+               kind: style.kinds[nodeIdx % style.kinds.length],
+               state: "locked", // updated by learning-path dynamically
+               mascot: nodeIdx === 3 // arbitrary mascot placement
+             })
+             nodeIdx++
+             nodes.push({
+               kind: style.kinds[nodeIdx % style.kinds.length],
+               state: "locked",
+               mascot: false
+             })
+             nodeIdx++
+          })
+          
+          // Pad to exactly match the old nodes length if we are Unit 4 or 5
+          while (index === 0 && nodes.length < 7) {
+             nodes.push({ kind: style.kinds[nodeIdx % style.kinds.length], state: "locked" })
+             nodeIdx++
+          }
+          while (index === 1 && nodes.length < 4) {
+             nodes.push({ kind: style.kinds[nodeIdx % style.kinds.length], state: "locked" })
+             nodeIdx++
+          }
+
           return {
-            section: index + 1,
-            unit: unit.order,
+            section: style.section,
+            unit: style.unit,
             title: unit.title,
-            color: colors[colorIdx],
-            edge: edges[colorIdx],
-            nodes: unit.skills.map(skill => ({
-              kind: "star", // default for skills
-              state: "locked", // updated by learning-path dynamically
-              mascot: skill.order === 1 // arbitrary logic for mascot
-            }))
+            color: style.color,
+            edge: style.edge,
+            nodes
           }
         })
         

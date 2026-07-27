@@ -84,53 +84,53 @@ def seed_courses(db: Session):
     db.commit()
     return course, skills
 
-def create_exercises_for_lesson(db: Session, lesson_id: str, lesson_idx: int):
-    exercises = [
-        Exercise(
-            id=f"exercise-{lesson_idx}-1", lesson_id=lesson_id, type=ExerciseType.MULTIPLE_CHOICE, question="Translate 'water'",
-            payload={"options": [{"id": "a", "text": "agua"}, {"id": "b", "text": "leche"}, {"id": "c", "text": "pan"}, {"id": "d", "text": "queso"}], "correctAnswerId": "a", "correctFeedback": "Great job!", "incorrectFeedback": "Agua means water."},
-            hint="It flows in rivers.", order=1
-        ),
-        Exercise(
-            id=f"exercise-{lesson_idx}-2", lesson_id=lesson_id, type=ExerciseType.WORD_BANK, question="Translate to English: 'La mujer bebe agua'",
-            payload={"words": ["The", "woman", "drinks", "water", "eats", "bread"], "correctAnswer": "The woman drinks water", "correctFeedback": "Perfect!", "incorrectFeedback": "It means: The woman drinks water."},
-            order=2
-        ),
-        Exercise(
-            id=f"exercise-{lesson_idx}-3", lesson_id=lesson_id, type=ExerciseType.TYPE_ANSWER, question="Type the translation for 'boy'",
-            payload={"correctAnswer": "niño", "correctFeedback": "Excellent!", "incorrectFeedback": "The word is niño."},
-            order=3
-        ),
-        Exercise(
-            id=f"exercise-{lesson_idx}-4", lesson_id=lesson_id, type=ExerciseType.MATCH_PAIRS, question="Match the words",
-            payload={"pairs": [{"id": "p1", "left": "agua", "right": "water"}, {"id": "p2", "left": "leche", "right": "milk"}, {"id": "p3", "left": "pan", "right": "bread"}, {"id": "p4", "left": "queso", "right": "cheese"}], "correctFeedback": "Awesome!", "incorrectFeedback": "Try matching them again."},
-            order=4
-        ),
-        Exercise(
-            id=f"exercise-{lesson_idx}-5", lesson_id=lesson_id, type=ExerciseType.FILL_BLANK, question="El hombre ___ pan",
-            payload={"correctAnswer": "come", "correctFeedback": "Good job!", "incorrectFeedback": "He eats bread: El hombre come pan."},
-            order=5
-        )
-    ]
-    db.add_all(exercises)
+import json
 
 def seed_lessons_and_exercises(db: Session, skills):
+    # Load the exact MOCK_LESSONS from JSON
+    json_path = os.path.join(os.path.dirname(__file__), "mock_lessons.json")
+    with open(json_path, "r", encoding="utf-8") as f:
+        mock_lessons = json.load(f)
+        
     all_lessons = []
-    lesson_idx = 1
-    for skill in skills:
-        for i in range(1, 4):
-            lesson_id = f"lesson-{skill.id.split('-')[1]}-{i}"
-            lesson = Lesson(
-                id=lesson_id, skill_id=skill.id, title=f"Lesson {i}", description=f"Learn {skill.title.lower()} concepts part {i}", order=i
-            )
-            db.add(lesson)
-            db.commit()
-            db.refresh(lesson)
-            all_lessons.append(lesson)
-            
-            create_exercises_for_lesson(db, lesson_id, lesson_idx)
-            lesson_idx += 1
     
+    # We want to create the lessons based on what's in the JSON.
+    # The JSON keys are "lesson-Unit 4-node-0" etc.
+    # We will just map them to the first skill to satisfy the DB schema (skill_id),
+    # since frontend fetches by lesson_id directly, the skill linkage is just for DB consistency.
+    
+    default_skill = skills[0].id if skills else "skill-greetings"
+    
+    order_idx = 1
+    for lesson_id, data in mock_lessons.items():
+        lesson = Lesson(
+            id=lesson_id, 
+            skill_id=default_skill, 
+            title=f"Lesson: {lesson_id}", 
+            description="Restored frontend lesson", 
+            order=order_idx
+        )
+        db.add(lesson)
+        db.commit()
+        db.refresh(lesson)
+        all_lessons.append(lesson)
+        
+        q_idx = 1
+        for q in data.get("questions", []):
+            ex = Exercise(
+                id=f"ex-{lesson_id}-{q_idx}",
+                lesson_id=lesson_id,
+                type=q["type"],
+                question=q["question"],
+                payload=q["payload"],
+                hint=q.get("prompt"),
+                order=q_idx
+            )
+            db.add(ex)
+            q_idx += 1
+            
+        order_idx += 1
+        
     db.commit()
     return all_lessons
 
@@ -202,14 +202,13 @@ def seed_activities(db: Session, demo_user: User):
 
 
 def run_seed():
+    Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
     try:
         demo_user, newly_created = seed_users(db)
-        if not newly_created:
-            print("Database is already seeded (demo user exists). Skipping.")
-            return
-
+        # Always seed
+        
         course, skills = seed_courses(db)
         lessons = seed_lessons_and_exercises(db, skills)
         quests, achievements = seed_quests_and_achievements(db)
