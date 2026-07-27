@@ -397,3 +397,11 @@ http://localhost:8000/docs
 This project was developed independently as part of the Scaler AI Labs Software Engineering Internship Assignment.
 
 All code, architecture, UI integration, backend implementation, and database design were created specifically for this submission.
+
+## Live Demo
+
+Frontend: https://duolingo-clone-zeta-eight.vercel.app/
+
+Backend API: https://duolingo-clone-ob9w.onrender.com
+
+API Docs: https://duolingo-clone-ob9w.onrender.com/docs
