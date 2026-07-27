@@ -1,12 +1,21 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { QuestionStatus, LessonMetadata, UserAnswer } from "@/domain/types/lesson-engine"
 import { MOCK_LESSONS } from "@/data/lesson-engine"
 import { validateExerciseAnswer } from "@/domain/utils/exercise-validators"
 import { useHearts } from "@/providers/hearts-provider"
+import { useXP } from "@/providers/xp-provider"
+import { XP_REWARDS } from "@/domain/constants/xp"
+import { useStreak } from "@/providers/streak-provider"
 
 export function useLesson(lessonId: string) {
   const { loseHeart, isOutOfHearts, hearts } = useHearts()
+  const { addXP, commitLessonRewards, resetLessonXP, currentLessonXP } = useXP()
+  const { completeLesson } = useStreak()
   
+  useEffect(() => {
+    resetLessonXP()
+  }, [lessonId])
+
   // Fallback to "fallback-lesson" only if the requested lesson doesn't exist
   const lessonData = MOCK_LESSONS[lessonId] || MOCK_LESSONS["fallback-lesson"]
   
@@ -25,6 +34,7 @@ export function useLesson(lessonId: string) {
   
   // Track correct answers for accuracy metadata
   const [correctCount, setCorrectCount] = useState(0)
+  const [incorrectCount, setIncorrectCount] = useState(0)
 
   const currentQuestion = lessonData?.questions[currentIndex]
   
@@ -45,7 +55,10 @@ export function useLesson(lessonId: string) {
 
     if (correct) {
       setCorrectCount(prev => prev + 1)
+      const xp = XP_REWARDS.EXERCISE_BASE[currentQuestion.type] || 5
+      addXP(xp)
     } else {
+      setIncorrectCount(prev => prev + 1)
       loseHeart()
     }
 
@@ -65,6 +78,9 @@ export function useLesson(lessonId: string) {
     if (nextIndex >= lessonData.questions.length) {
       setLessonCompleted(true)
       
+      // Update the global streak
+      completeLesson()
+      
       // Save completed lesson to localStorage
       const storedLessons = localStorage.getItem("completedLessons")
       const completed = storedLessons ? JSON.parse(storedLessons) : []
@@ -77,12 +93,21 @@ export function useLesson(lessonId: string) {
       const storedMetadata = localStorage.getItem("lessonMetadata")
       const metadataDict = storedMetadata ? JSON.parse(storedMetadata) : {}
       
+      const isPerfect = incorrectCount === 0
+      const base = XP_REWARDS.LESSON_COMPLETE_BASE
+      const perfectBonus = isPerfect ? XP_REWARDS.PERFECT_LESSON_BONUS : 0
+      
+      commitLessonRewards({ base, perfectBonus })
+      const finalXP = currentLessonXP + base + perfectBonus
+
       const newMetadata: LessonMetadata = {
         lessonId,
         completedAt: new Date().toISOString(),
         accuracy: correctCount / lessonData.questions.length,
         heartsRemaining: hearts, 
-        xpEarned: 15        // Static XP for now
+        xpEarned: finalXP,
+        correctAnswers: correctCount,
+        incorrectAnswers: incorrectCount
       }
       
       metadataDict[lessonId] = newMetadata
@@ -105,6 +130,8 @@ export function useLesson(lessonId: string) {
     setLessonCompleted(false)
     setGameOver(false)
     setCorrectCount(0)
+    setIncorrectCount(0)
+    resetLessonXP()
   }
 
   return {

@@ -1,11 +1,14 @@
 import { DuoCard, ProgressBar } from "@/components/shared"
 import type { DailyGoal } from "@/domain/types/profile"
+import { useXP } from "@/providers/xp-provider"
 
 interface DailyGoalCardProps {
   goal: DailyGoal
 }
 
 export function DailyGoalCard({ goal }: DailyGoalCardProps) {
+  const { dailyXP } = useXP()
+
   return (
     <DuoCard>
       <div className="flex items-center justify-between">
@@ -20,7 +23,7 @@ export function DailyGoalCard({ goal }: DailyGoalCardProps) {
           <div className="flex-1">
             <h4 className="mb-1 text-sm font-bold text-foreground">Earn {goal.target} XP</h4>
             <ProgressBar
-              current={goal.current}
+              current={dailyXP}
               target={goal.target}
               fillClassName="bg-duo-gold"
             />

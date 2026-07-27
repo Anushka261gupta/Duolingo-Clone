@@ -1,0 +1,11 @@
+export const XP_REWARDS = {
+  EXERCISE_BASE: {
+    MULTIPLE_CHOICE: 5,
+    WORD_BANK: 8,
+    TYPE_ANSWER: 10,
+    TRANSLATE: 10,
+    LISTENING: 12,
+  },
+  LESSON_COMPLETE_BASE: 10,
+  PERFECT_LESSON_BONUS: 5,
+} as const

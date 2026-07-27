@@ -3,11 +3,12 @@
 import { Zap } from "lucide-react"
 
 import { DuoCard } from "@/components/shared"
-import { MOCK_XP_GOAL } from "@/data/quests"
+import { useXP } from "@/providers/xp-provider"
 
 export function XpGoal() {
-  const { current, target } = MOCK_XP_GOAL
-  const pct = Math.round((current / target) * 100)
+  const { dailyXP } = useXP()
+  const target = 50
+  const pct = Math.min(100, Math.round((dailyXP / target) * 100))
 
   return (
     <DuoCard>
@@ -18,7 +19,7 @@ export function XpGoal() {
         </div>
         <div className="flex-1">
           <div className="mb-1 flex items-baseline justify-between">
-            <span className="text-sm font-bold text-duo-ink">{current} XP earned</span>
+            <span className="text-sm font-bold text-duo-ink">{dailyXP} XP earned</span>
             <span className="text-xs font-bold text-duo-gray">{target} XP</span>
           </div>
           <div className="h-4 w-full overflow-hidden rounded-full bg-duo-gray-light">

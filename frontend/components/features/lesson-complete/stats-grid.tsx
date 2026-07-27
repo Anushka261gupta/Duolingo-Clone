@@ -7,10 +7,11 @@ interface StatsGridProps {
   accuracy: number
   heartsRemaining: number
   maxHearts: number
-  streak: StreakProgress
+  correctAnswers: number
+  incorrectAnswers: number
 }
 
-export function StatsGrid({ accuracy, heartsRemaining, maxHearts, streak }: StatsGridProps) {
+export function StatsGrid({ accuracy, heartsRemaining, maxHearts, correctAnswers, incorrectAnswers }: StatsGridProps) {
   return (
     <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-3">
       <DuoCard className="flex flex-col items-center gap-2 py-5 text-center">
@@ -41,22 +42,19 @@ export function StatsGrid({ accuracy, heartsRemaining, maxHearts, streak }: Stat
         </p>
       </DuoCard>
 
-      <DuoCard className="flex flex-col gap-3 py-5 sm:col-span-1">
+      <DuoCard className="flex flex-col items-center gap-2 py-5 text-center">
         <div className="flex items-center gap-3">
-          <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-duo-gold/15">
-            <Flame className="size-6 fill-duo-gold text-duo-gold" strokeWidth={0} />
+          <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-duo-green/15 text-duo-green font-bold">
+            {correctAnswers}
           </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-bold uppercase tracking-wide text-duo-gray">{streak.label}</p>
-            <p className="text-2xl font-extrabold text-duo-ink">{streak.current} days</p>
+          <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-duo-red/15 text-duo-red font-bold">
+            {incorrectAnswers}
           </div>
         </div>
-        <ProgressBar
-          current={streak.current}
-          target={streak.target}
-          fillClassName="bg-duo-gold"
-          showLabel={false}
-        />
+        <p className="text-sm font-bold uppercase tracking-wide text-duo-gray">Answers</p>
+        <p className="text-lg font-extrabold text-duo-ink text-center flex gap-1">
+          <span className="text-duo-green">Correct</span> / <span className="text-duo-red">Incorrect</span>
+        </p>
       </DuoCard>
     </div>
   )

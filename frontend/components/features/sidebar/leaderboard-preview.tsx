@@ -1,11 +1,13 @@
 "use client"
 
-import { ChevronRight, Trophy } from "lucide-react"
+import { ChevronRight, Trophy, Loader2 } from "lucide-react"
 
 import { DuoCard } from "@/components/shared"
-import { MOCK_LEADERBOARD } from "@/data/leaderboard"
+import { useLeaderboard } from "@/hooks/use-leaderboard"
 
 export function LeaderboardPreview() {
+  const { data, isLoading } = useLeaderboard()
+
   return (
     <DuoCard>
       <div className="mb-4 flex items-center justify-between">
@@ -20,24 +22,31 @@ export function LeaderboardPreview() {
           View <ChevronRight className="size-4" strokeWidth={3} />
         </button>
       </div>
-      <ul className="flex flex-col gap-1">
-        {MOCK_LEADERBOARD.map((l) => (
-          <li
-            key={l.rank}
-            className={`flex items-center gap-3 rounded-xl px-2 py-2 ${l.you ? "bg-duo-blue/10" : ""}`}
-          >
-            <span
-              className={`flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-extrabold text-white ${l.medal}`}
+      
+      {isLoading || !data ? (
+        <div className="flex h-32 items-center justify-center">
+          <Loader2 className="size-6 animate-spin text-duo-gray" />
+        </div>
+      ) : (
+        <ul className="flex flex-col gap-1">
+          {data.entries.slice(0, 5).map((l) => (
+            <li
+              key={l.id}
+              className={`flex items-center gap-3 rounded-xl px-2 py-2 ${l.you ? "bg-duo-blue/10" : ""}`}
             >
-              {l.rank}
-            </span>
-            <span className={`flex-1 text-sm font-bold ${l.you ? "text-duo-blue" : "text-duo-ink"}`}>
-              {l.name}
-            </span>
-            <span className="text-sm font-bold text-duo-gray">{l.xp} XP</span>
-          </li>
-        ))}
-      </ul>
+              <span
+                className={`flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-extrabold text-white ${l.you ? "bg-duo-blue" : "bg-duo-gray"}`}
+              >
+                {l.rank}
+              </span>
+              <span className={`flex-1 text-sm font-bold ${l.you ? "text-duo-blue" : "text-duo-ink"}`}>
+                {l.name}
+              </span>
+              <span className="text-sm font-bold text-duo-gray">{l.xp} XP</span>
+            </li>
+          ))}
+        </ul>
+      )}
     </DuoCard>
   )
 }

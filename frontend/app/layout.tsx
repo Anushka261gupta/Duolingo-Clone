@@ -5,6 +5,10 @@ import { Nunito } from 'next/font/google'
 import { siteConfig } from '@/config/site'
 import { AuthProvider } from '@/providers/auth-provider'
 import { HeartsProvider } from '@/providers/hearts-provider'
+import { XPProvider } from '@/providers/xp-provider'
+import { GemsProvider } from '@/providers/gems-provider'
+import { StreakProvider } from '@/providers/streak-provider'
+import { FloatingXPOverlay, AchievementToastOverlay } from "@/components/shared"
 
 import './globals.css'
 
@@ -54,10 +58,18 @@ export default function RootLayout({
     <html lang="en" className={`${nunito.variable} bg-background`}>
       <body className="font-sans antialiased">
         <AuthProvider>
-          <HeartsProvider>
-            {children}
-            {process.env.NODE_ENV === 'production' && <Analytics />}
-          </HeartsProvider>
+          <GemsProvider>
+            <StreakProvider>
+              <HeartsProvider>
+                <XPProvider>
+                  {children}
+                  <FloatingXPOverlay />
+                  <AchievementToastOverlay />
+                  {process.env.NODE_ENV === 'production' && <Analytics />}
+                </XPProvider>
+              </HeartsProvider>
+            </StreakProvider>
+          </GemsProvider>
         </AuthProvider>
       </body>
     </html>

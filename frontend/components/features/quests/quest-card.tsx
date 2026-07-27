@@ -14,9 +14,11 @@ export interface QuestCardProps {
   fill?: string
   rewardText?: string
   timeRemaining?: string
+  onClaim?: (id: string) => void
 }
 
 export function QuestCard({
+  id,
   title,
   description,
   current,
@@ -27,6 +29,7 @@ export function QuestCard({
   fill = "bg-duo-orange",
   rewardText,
   timeRemaining,
+  onClaim
 }: QuestCardProps) {
   const isLocked = status === 'locked'
   const isCompleted = status === 'completed'
@@ -35,6 +38,8 @@ export function QuestCard({
   const activeTint = isLocked ? "text-duo-gray" : tint
   const activeFill = isLocked ? "bg-duo-gray-light" : fill
   const opacity = isClaimed ? "opacity-50" : "opacity-100"
+
+  const label = isClaimed ? "Claimed" : isCompleted ? "Completed ✓" : `${current} / ${target}`
 
   return (
     <div className={`flex flex-col gap-4 py-4 md:flex-row md:items-center ${opacity}`}>
@@ -69,7 +74,7 @@ export function QuestCard({
 
         <div className="flex items-center gap-3">
           <div className="flex-1">
-            <ProgressBar current={current} target={target} fillClassName={activeFill} />
+            <ProgressBar current={current} target={target} fillClassName={activeFill} label={label} />
           </div>
           {rewardText && (
             <div className="shrink-0 text-sm font-extrabold text-duo-gray">
@@ -88,12 +93,8 @@ export function QuestCard({
       {isCompleted && (
         <div className="mt-2 flex shrink-0 justify-end md:mt-0 md:ml-4">
           <button 
+            onClick={() => onClaim?.(id)}
             className="rounded-xl bg-duo-blue px-6 py-3 font-extrabold uppercase tracking-wide text-white transition-opacity hover:opacity-80 active:opacity-100 shadow-[0_4px_0_0_#1cb0f6]"
-            onClick={() => {
-              // TODO: FUTURE API INTEGRATION
-              // Trigger claim reward mutation here
-              console.log("Claim reward clicked")
-            }}
           >
             Claim
           </button>

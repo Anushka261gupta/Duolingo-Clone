@@ -5,10 +5,11 @@ import { Star } from "lucide-react"
 
 interface WeeklyChallengeProps {
   challenge: Challenge
+  onClaim?: (id: string) => void
 }
 
-export function WeeklyChallenge({ challenge }: WeeklyChallengeProps) {
-  const Icon = challenge.reward.icon || Star
+export function WeeklyChallenge({ challenge, onClaim }: WeeklyChallengeProps) {
+  const Icon = challenge.reward?.icon || Star
   
   return (
     <DuoCard>
@@ -26,8 +27,9 @@ export function WeeklyChallenge({ challenge }: WeeklyChallengeProps) {
         status={challenge.status}
         tint="text-duo-purple"
         fill="bg-duo-purple"
-        rewardText={challenge.reward.amount ? `+${challenge.reward.amount} ${challenge.reward.type}` : challenge.reward.type}
+        rewardText={challenge.reward?.amount ? `+${challenge.reward.amount} ${challenge.reward.type}` : challenge.reward?.type}
         timeRemaining={challenge.timeRemaining}
+        onClaim={onClaim}
       />
     </DuoCard>
   )

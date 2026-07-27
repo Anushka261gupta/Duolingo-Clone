@@ -6,9 +6,10 @@ import { Fragment } from "react"
 
 interface AchievementProgressProps {
   achievements: Challenge[]
+  onClaim?: (id: string, amount: number) => void
 }
 
-export function AchievementProgress({ achievements }: AchievementProgressProps) {
+export function AchievementProgress({ achievements, onClaim }: AchievementProgressProps) {
   return (
     <DuoCard>
       <div className="mb-4">
@@ -17,7 +18,7 @@ export function AchievementProgress({ achievements }: AchievementProgressProps) 
 
       <div className="flex flex-col">
         {achievements.map((achievement, index) => {
-          const Icon = achievement.reward.icon || Trophy
+          const Icon = achievement.reward?.icon || Trophy
           
           return (
             <Fragment key={achievement.id}>
@@ -31,7 +32,8 @@ export function AchievementProgress({ achievements }: AchievementProgressProps) 
                 status={achievement.status}
                 tint="text-duo-gold"
                 fill="bg-duo-gold"
-                rewardText={achievement.reward.amount ? `+${achievement.reward.amount}` : undefined}
+                rewardText={achievement.reward?.amount ? `+${achievement.reward.amount}` : undefined}
+                onClaim={() => onClaim?.(achievement.id, achievement.reward?.amount || 0)}
               />
               {index < achievements.length - 1 && (
                 <div className="mx-2 my-2 h-[2px] bg-duo-gray-lighter" />

@@ -1,14 +1,20 @@
 "use client"
 
-import { Flame, Gem, Heart } from "lucide-react"
+import { Flame, Heart, Zap, Gem } from "lucide-react"
 
-import { CourseFlag, StatBadge } from "@/components/shared"
+import { CourseFlag, StatBadge, AnimatedCounter } from "@/components/shared"
 import { MAIN_NAV_ITEMS } from "@/domain/constants/navigation"
 
 import { useHearts } from "@/providers/hearts-provider"
+import { useXP } from "@/providers/xp-provider"
+import { useGems } from "@/providers/gems-provider"
+import { useStreak } from "@/providers/streak-provider"
 
 export function TopNav() {
   const { hearts } = useHearts()
+  const { totalXP } = useXP()
+  const { gems } = useGems()
+  const { currentStreak, hasCompletedToday } = useStreak()
   
   return (
     <header className="sticky top-0 z-50 border-b-2 border-duo-gray-light bg-background/95 backdrop-blur">
@@ -49,14 +55,20 @@ export function TopNav() {
             <CourseFlag />
           </button>
           <StatBadge
+            icon={<Zap className="size-6 fill-duo-gold text-duo-gold" strokeWidth={0} />}
+            value={<AnimatedCounter value={totalXP} durationMs={800} />}
+            color="text-duo-gold"
+            label="Total XP"
+          />
+          <StatBadge
             icon={<Flame className="size-6 fill-duo-gold text-duo-gold" strokeWidth={0} />}
-            value={7}
+            value={currentStreak}
             color="text-duo-gold"
             label="Day streak"
           />
           <StatBadge
             icon={<Gem className="size-6 fill-duo-blue text-duo-blue" strokeWidth={0} />}
-            value={505}
+            value={<AnimatedCounter value={gems} durationMs={800} />}
             color="text-duo-blue"
             label="Gems"
           />

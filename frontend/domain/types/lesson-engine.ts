@@ -68,4 +68,6 @@ export interface LessonMetadata {
   accuracy: number
   heartsRemaining: number
   xpEarned: number
+  correctAnswers: number
+  incorrectAnswers: number
 }

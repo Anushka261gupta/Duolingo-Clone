@@ -1,10 +1,10 @@
 "use client"
 
 import { MainContent } from "@/components/layout"
-import { useQuests } from "@/hooks/use-quests"
+import { useQuestEngine } from "@/hooks/use-quest-engine"
+import { useAchievementEngine } from "@/hooks/use-achievement-engine"
 import {
   QuestsLoading,
-  QuestsEmptyState,
   QuestsHeader,
   DailyQuests,
   WeeklyChallenge,
@@ -13,9 +13,21 @@ import {
 } from "@/components/features/quests"
 
 export default function QuestsPage() {
-  const { data, isLoading, isEmpty } = useQuests()
+  const { 
+    isLoaded: questsLoaded, 
+    dailyQuest, 
+    weeklyChallenge, 
+    monthlyChallenge, 
+    claimReward: claimQuest 
+  } = useQuestEngine()
+  
+  const { 
+    isLoaded: achievementsLoaded, 
+    achievements, 
+    claimReward: claimAchievement 
+  } = useAchievementEngine()
 
-  if (isLoading) {
+  if (!questsLoaded || !achievementsLoaded) {
     return (
       <MainContent>
         <QuestsLoading />
@@ -23,26 +35,21 @@ export default function QuestsPage() {
     )
   }
 
-  if (isEmpty || !data) {
-    return (
-      <MainContent>
-        <QuestsEmptyState />
-      </MainContent>
-    )
-  }
+  // We are mapping the single dailyQuest to an array since DailyQuests expects Quest[]
+  const dailyQuestsList = [dailyQuest]
 
   return (
     <MainContent>
       <div className="flex flex-col gap-6 pb-24">
         <QuestsHeader />
         
-        <DailyQuests quests={data.dailyQuests} />
+        <DailyQuests quests={dailyQuestsList} onClaim={(id) => claimQuest(id, dailyQuest.reward?.amount || 10)} />
         
-        <WeeklyChallenge challenge={data.weeklyChallenge} />
+        <WeeklyChallenge challenge={weeklyChallenge} onClaim={(id) => claimQuest(id, weeklyChallenge.rewardAmount)} />
         
-        <MonthlyChallenge challenge={data.monthlyChallenge} />
+        <MonthlyChallenge challenge={monthlyChallenge} onClaim={(id) => claimQuest(id, monthlyChallenge.rewardAmount)} />
         
-        <AchievementProgress achievements={data.achievements} />
+        <AchievementProgress achievements={achievements} onClaim={(id, amount) => claimAchievement(id, amount)} />
       </div>
     </MainContent>
   )

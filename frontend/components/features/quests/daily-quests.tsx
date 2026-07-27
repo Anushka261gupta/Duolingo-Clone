@@ -5,9 +5,10 @@ import { Fragment } from "react"
 
 interface DailyQuestsProps {
   quests: Quest[]
+  onClaim?: (id: string) => void
 }
 
-export function DailyQuests({ quests }: DailyQuestsProps) {
+export function DailyQuests({ quests, onClaim }: DailyQuestsProps) {
   return (
     <DuoCard>
       <div className="mb-4">
@@ -28,6 +29,7 @@ export function DailyQuests({ quests }: DailyQuestsProps) {
               tint={quest.tint}
               fill={quest.fill}
               rewardText={quest.reward ? `+${quest.reward.amount} ${quest.reward.type}` : undefined}
+              onClaim={onClaim}
             />
             {index < quests.length - 1 && (
               <div className="mx-2 my-2 h-[2px] bg-duo-gray-lighter" />

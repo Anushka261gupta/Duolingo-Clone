@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
@@ -78,7 +78,7 @@ export function LessonView({ lessonId }: LessonViewProps) {
           {currentQuestion.question}
         </h1>
 
-        <ExerciseRenderer 
+        <ExerciseRenderer
           exercise={currentQuestion}
           selectedAnswer={selectedAnswer}
           answerState={answerState}
@@ -87,9 +87,9 @@ export function LessonView({ lessonId }: LessonViewProps) {
       </div>
 
       {questionStatus !== "submitted" && (
-        <ContinueButton 
-          disabled={selectedAnswer === null || selectedAnswer === "" || (Array.isArray(selectedAnswer) && selectedAnswer.length === 0)} 
-          onClick={submitAnswer} 
+        <ContinueButton
+          disabled={selectedAnswer === null || selectedAnswer === "" || (Array.isArray(selectedAnswer) && selectedAnswer.length === 0)}
+          onClick={submitAnswer}
         />
       )}
 
@@ -97,8 +97,8 @@ export function LessonView({ lessonId }: LessonViewProps) {
         <FeedbackBar
           isCorrect={!!isCorrect}
           message={
-            isCorrect 
-              ? currentQuestion.payload.correctFeedback 
+            isCorrect
+              ? currentQuestion.payload.correctFeedback
               : currentQuestion.payload.incorrectFeedback
           }
           onContinue={nextQuestion}

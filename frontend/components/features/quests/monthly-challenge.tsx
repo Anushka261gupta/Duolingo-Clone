@@ -5,10 +5,11 @@ import { Medal } from "lucide-react"
 
 interface MonthlyChallengeProps {
   challenge: Challenge
+  onClaim?: (id: string) => void
 }
 
-export function MonthlyChallenge({ challenge }: MonthlyChallengeProps) {
-  const Icon = challenge.reward.icon || Medal
+export function MonthlyChallenge({ challenge, onClaim }: MonthlyChallengeProps) {
+  const Icon = challenge.reward?.icon || Medal
   
   return (
     <DuoCard>
@@ -26,8 +27,9 @@ export function MonthlyChallenge({ challenge }: MonthlyChallengeProps) {
         status={challenge.status}
         tint="text-duo-blue"
         fill="bg-duo-blue"
-        rewardText={challenge.reward.type}
+        rewardText={challenge.reward?.type}
         timeRemaining={challenge.timeRemaining}
+        onClaim={onClaim}
       />
     </DuoCard>
   )

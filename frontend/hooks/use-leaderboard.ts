@@ -1,26 +1,34 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { WeeklyLeaderboard } from "@/domain/types"
 import { MOCK_WEEKLY_LEADERBOARD } from "@/data/leaderboard"
+import { useXP } from "@/providers/xp-provider"
 
 export function useLeaderboard() {
-  const [data, setData] = useState<WeeklyLeaderboard | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
+  const { weeklyXP } = useXP()
+
+  const data = useMemo(() => {
+    // Inject live weeklyXP into the current user's entry (mock user has you: true)
+    const mergedData = {
+      ...MOCK_WEEKLY_LEADERBOARD,
+      entries: [...MOCK_WEEKLY_LEADERBOARD.entries].map(entry => 
+        entry.you ? { ...entry, xp: weeklyXP } : entry
+      ).sort((a, b) => b.xp - a.xp)
+    }
+    
+    mergedData.entries = mergedData.entries.map((entry, index) => ({
+      ...entry,
+      rank: index + 1
+    }))
+
+    return mergedData
+  }, [weeklyXP])
 
   useEffect(() => {
-    // TODO: FUTURE API INTEGRATION
-    // Replace this setTimeout with an actual fetch call:
-    // fetch('/api/leaderboard')
-    //   .then(res => res.json())
-    //   .then(setData)
-    //   .catch(setError)
-    //   .finally(() => setIsLoading(false))
-
     const timer = setTimeout(() => {
-      setData(MOCK_WEEKLY_LEADERBOARD)
       setIsLoading(false)
     }, 1000)
-
     return () => clearTimeout(timer)
   }, [])
 

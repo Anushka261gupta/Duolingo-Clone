@@ -15,9 +15,13 @@ import { Loader2, LogOut } from "lucide-react"
 import { useAuthContext } from "@/providers/auth-provider"
 import { Button } from "@/components/ui/button"
 import { ConfirmationDialog } from "@/components/shared"
+import { useXP } from "@/providers/xp-provider"
+import { useStreak } from "@/providers/streak-provider"
 
 export default function ProfilePage() {
   const { data: profile, isLoading, isEmpty } = useProfile()
+  const { totalXP } = useXP()
+  const { currentStreak, longestStreak, completedDates } = useStreak()
   const { logout } = useAuthContext()
   const [isLogoutOpen, setIsLogoutOpen] = useState(false)
 
@@ -58,8 +62,10 @@ export default function ProfilePage() {
           {/* Left Column */}
           <div className="flex flex-col gap-6">
             <ProfileStats
-              streak={profile.streak}
-              totalXp={profile.totalXp}
+              streak={currentStreak}
+              longestStreak={longestStreak}
+              daysActive={completedDates.length}
+              totalXp={totalXP}
               hearts={profile.hearts}
               gems={profile.gems}
               completedLessons={profile.completedLessons}
