@@ -22,7 +22,7 @@ interface XPContextValue {
   weeklyXP: number
   monthlyXP: number
   currentLessonXP: number
-  addXP: (amount: number) => void
+  addXP: (amount: number, isMultiplier?: boolean) => void
   resetLessonXP: () => void
   commitLessonRewards: (rewards: LessonRewards) => void
 }
@@ -84,7 +84,7 @@ export function XPProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("xp_data", JSON.stringify(newData))
   }
 
-  const addXP = (amount: number) => {
+  const addXP = (amount: number, isMultiplier?: boolean) => {
     if (!data) return
     const now = new Date().toISOString()
     const newTotal = data.totalXP + amount
@@ -101,7 +101,7 @@ export function XPProvider({ children }: { children: React.ReactNode }) {
       }
     })
 
-    window.dispatchEvent(new CustomEvent("xp-earned", { detail: { amount } }))
+    window.dispatchEvent(new CustomEvent("xp-earned", { detail: { amount, isMultiplier } }))
 
     save({
       ...data,
@@ -123,6 +123,15 @@ export function XPProvider({ children }: { children: React.ReactNode }) {
     if (!data) return
     const totalBonus = rewards.base + (rewards.perfectBonus || 0)
     addXP(totalBonus)
+
+    window.dispatchEvent(
+      new CustomEvent("log-activity", {
+        detail: {
+          type: "LESSON_COMPLETED",
+          metadata: { xpEarned: totalBonus }
+        }
+      })
+    )
   }
 
   const value: XPContextValue = {

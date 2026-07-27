@@ -114,21 +114,39 @@ export const MOCK_LESSONS: Record<string, LessonData> = {
     id: "lesson-Unit 4-node-4",
     questions: [
       {
-        id: "q1", type: "LISTENING", prompt: "Listen and type", question: "",
+        id: "q1", type: "MATCH_PAIRS", prompt: "Match the words", question: "",
         payload: {
-          audioText: "La mujer bebe agua", correctAnswer: "La mujer bebe agua", correctFeedback: "Great!", incorrectFeedback: "You heard: La mujer bebe agua."
+          pairs: [
+            { id: "p1", left: "mujer", right: "woman" },
+            { id: "p2", left: "bebe", right: "drinks" },
+            { id: "p3", left: "agua", right: "water" },
+            { id: "p4", left: "pan", right: "bread" }
+          ],
+          correctFeedback: "Great!", incorrectFeedback: "Check your matches."
         }
       },
       {
-        id: "q2", type: "LISTENING", prompt: "Listen and type", question: "",
+        id: "q2", type: "MATCH_PAIRS", prompt: "Match the words", question: "",
         payload: {
-          audioText: "El niño come queso", correctAnswer: "El niño come queso", correctFeedback: "Perfect!", incorrectFeedback: "You heard: El niño come queso."
+          pairs: [
+            { id: "p1", left: "niño", right: "boy" },
+            { id: "p2", left: "come", right: "eats" },
+            { id: "p3", left: "queso", right: "cheese" },
+            { id: "p4", left: "leche", right: "milk" }
+          ],
+          correctFeedback: "Perfect!", incorrectFeedback: "Check your matches."
         }
       },
       {
-        id: "q3", type: "LISTENING", prompt: "Listen and type", question: "",
+        id: "q3", type: "MATCH_PAIRS", prompt: "Match the words", question: "",
         payload: {
-          audioText: "El pan es bueno", correctAnswer: "El pan es bueno", correctFeedback: "Excellent!", incorrectFeedback: "You heard: El pan es bueno."
+          pairs: [
+            { id: "p1", left: "bueno", right: "good" },
+            { id: "p2", left: "fria", right: "cold" },
+            { id: "p3", left: "caliente", right: "hot" },
+            { id: "p4", left: "hombre", right: "man" }
+          ],
+          correctFeedback: "Excellent!", incorrectFeedback: "Check your matches."
         }
       }
     ]
@@ -160,9 +178,15 @@ export const MOCK_LESSONS: Record<string, LessonData> = {
     id: "lesson-Unit 4-node-6",
     questions: [
       {
-        id: "q1", type: "LISTENING", prompt: "Listen and type", question: "",
+        id: "q1", type: "MATCH_PAIRS", prompt: "Match the words", question: "",
         payload: {
-          audioText: "El hombre y la mujer", correctAnswer: "El hombre y la mujer", correctFeedback: "Great!", incorrectFeedback: "You heard: El hombre y la mujer."
+          pairs: [
+            { id: "p1", left: "hombre", right: "man" },
+            { id: "p2", left: "y", right: "and" },
+            { id: "p3", left: "mujer", right: "woman" },
+            { id: "p4", left: "niña", right: "girl" }
+          ],
+          correctFeedback: "Great!", incorrectFeedback: "Check your matches."
         }
       },
       {
@@ -242,15 +266,27 @@ export const MOCK_LESSONS: Record<string, LessonData> = {
     id: "lesson-Unit 5-node-2",
     questions: [
       {
-        id: "q1", type: "LISTENING", prompt: "Listen and type", question: "",
+        id: "q1", type: "MATCH_PAIRS", prompt: "Match the verbs", question: "",
         payload: {
-          audioText: "El hombre comió queso", correctAnswer: "El hombre comió queso", correctFeedback: "Great!", incorrectFeedback: "You heard: El hombre comió queso."
+          pairs: [
+            { id: "p1", left: "comió", right: "ate (he/she)" },
+            { id: "p2", left: "bebió", right: "drank (he/she)" },
+            { id: "p3", left: "fue", right: "went (he/she)" },
+            { id: "p4", left: "hombre", right: "man" }
+          ],
+          correctFeedback: "Great!", incorrectFeedback: "Check your matches."
         }
       },
       {
-        id: "q2", type: "LISTENING", prompt: "Listen and type", question: "",
+        id: "q2", type: "MATCH_PAIRS", prompt: "Match the words", question: "",
         payload: {
-          audioText: "La mujer bebió agua", correctAnswer: "La mujer bebió agua", correctFeedback: "Perfect!", incorrectFeedback: "You heard: La mujer bebió agua."
+          pairs: [
+            { id: "p1", left: "ayer", right: "yesterday" },
+            { id: "p2", left: "anoche", right: "last night" },
+            { id: "p3", left: "agua", right: "water" },
+            { id: "p4", left: "queso", right: "cheese" }
+          ],
+          correctFeedback: "Perfect!", incorrectFeedback: "Check your matches."
         }
       },
       {
@@ -277,9 +313,15 @@ export const MOCK_LESSONS: Record<string, LessonData> = {
         }
       },
       {
-        id: "q3", type: "LISTENING", prompt: "Listen and type", question: "",
+        id: "q3", type: "MATCH_PAIRS", prompt: "Match the words", question: "",
         payload: {
-          audioText: "La niña fue al mercado ayer", correctAnswer: "La niña fue al mercado ayer", correctFeedback: "Excellent!", incorrectFeedback: "You heard: La niña fue al mercado ayer."
+          pairs: [
+            { id: "p1", left: "mercado", right: "market" },
+            { id: "p2", left: "parque", right: "park" },
+            { id: "p3", left: "niña", right: "girl" },
+            { id: "p4", left: "fui", right: "I went" }
+          ],
+          correctFeedback: "Excellent!", incorrectFeedback: "Check your matches."
         }
       },
       {

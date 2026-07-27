@@ -28,6 +28,9 @@ export function validateExerciseAnswer(exercise: LessonQuestion, answer: UserAns
       
     return normalize(answer) === normalize(exercise.payload.correctAnswer)
   }
+  if (exercise.type === "MATCH_PAIRS") {
+    return answer !== null && typeof answer === 'object' && !Array.isArray(answer) && (answer as any).complete === true
+  }
   
   return false
 }

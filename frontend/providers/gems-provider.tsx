@@ -16,10 +16,10 @@ export function GemsProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const saved = localStorage.getItem("gems_data")
-    if (saved) {
+    if (saved !== null) {
       try {
         const parsed = parseInt(saved, 10)
-        setGems(isNaN(parsed) ? 500 : parsed)
+        setGems(!isNaN(parsed) && Number.isFinite(parsed) ? parsed : 500)
       } catch (e) {
         setGems(500)
       }
@@ -30,17 +30,23 @@ export function GemsProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const save = (newAmount: number) => {
+    if (!Number.isFinite(newAmount) || isNaN(newAmount)) {
+      console.error("[GemsProvider] Attempted to save invalid gems amount:", newAmount)
+      return
+    }
     setGems(newAmount)
     localStorage.setItem("gems_data", newAmount.toString())
   }
 
   const addGems = (amount: number) => {
-    save(gems + amount)
+    const validAmount = Number(amount) || 0
+    save(gems + validAmount)
   }
 
   const spendGems = (amount: number) => {
-    if (gems >= amount) {
-      save(gems - amount)
+    const validAmount = Number(amount) || 0
+    if (gems >= validAmount) {
+      save(gems - validAmount)
     }
   }
 

@@ -5,27 +5,34 @@ import { MainContent } from "@/components/layout"
 import {
   ProfileHeader,
   ProfileStats,
-  DailyGoalCard,
-  AchievementsSection,
+  ProfileQuests,
+  ProfileAchievements,
   LearningLanguageCard,
   RecentActivity,
 } from "@/components/features/profile"
-import { useProfile } from "@/hooks/use-profile"
 import { Loader2, LogOut } from "lucide-react"
 import { useAuthContext } from "@/providers/auth-provider"
 import { Button } from "@/components/ui/button"
 import { ConfirmationDialog } from "@/components/shared"
 import { useXP } from "@/providers/xp-provider"
 import { useStreak } from "@/providers/streak-provider"
+import { useGems } from "@/providers/gems-provider"
+import { useHearts } from "@/providers/hearts-provider"
+import { useProgress } from "@/hooks/use-progress"
+import { useLeaderboard } from "@/hooks/use-leaderboard"
+import { mockUserProfile } from "@/data/profile"
 
 export default function ProfilePage() {
-  const { data: profile, isLoading, isEmpty } = useProfile()
+  const { user, isLoading: authLoading, logout } = useAuthContext()
   const { totalXP } = useXP()
   const { currentStreak, longestStreak, completedDates } = useStreak()
-  const { logout } = useAuthContext()
+  const { gems } = useGems()
+  const { hearts } = useHearts()
+  const { completedLessonCount, completedUnitCount } = useProgress()
+  const { data: leaderboardData } = useLeaderboard()
   const [isLogoutOpen, setIsLogoutOpen] = useState(false)
 
-  if (isLoading) {
+  if (authLoading) {
     return (
       <MainContent>
         <div className="flex h-[50vh] items-center justify-center">
@@ -35,27 +42,24 @@ export default function ProfilePage() {
     )
   }
 
-  if (isEmpty || !profile) {
-    return (
-      <MainContent>
-        <div className="flex h-[50vh] flex-col items-center justify-center text-center">
-          <h2 className="mb-2 text-2xl font-extrabold text-foreground">
-            Profile Not Found
-          </h2>
-          <p className="text-duo-gray">We couldn't load this profile.</p>
-        </div>
-      </MainContent>
-    )
-  }
+  // Graceful fallback if auth context is not available yet
+  const displayName = user?.name || mockUserProfile.displayName
+  const username = user?.username || mockUserProfile.username
+  const avatarUrl = user?.avatar || mockUserProfile.avatarUrl
+  const joinDate = mockUserProfile.joinDate // Auth context might not provide join date initially
+  const currentLanguage = mockUserProfile.currentLanguage
+  const leagueName = leaderboardData?.league?.name
 
   return (
     <MainContent>
       <div className="flex flex-col gap-6 pb-24">
         <ProfileHeader
-          displayName={profile.displayName}
-          username={profile.username}
-          joinDate={profile.joinDate}
-          avatarUrl={profile.avatarUrl}
+          displayName={displayName}
+          username={username}
+          joinDate={joinDate}
+          avatarUrl={avatarUrl}
+          courseName={currentLanguage.name}
+          leagueName={leagueName}
         />
 
         <div className="grid gap-6 md:grid-cols-2">
@@ -66,19 +70,19 @@ export default function ProfilePage() {
               longestStreak={longestStreak}
               daysActive={completedDates.length}
               totalXp={totalXP}
-              hearts={profile.hearts}
-              gems={profile.gems}
-              completedLessons={profile.completedLessons}
-              completedUnits={profile.completedUnits}
+              hearts={hearts}
+              gems={gems}
+              completedLessons={completedLessonCount}
+              completedUnits={completedUnitCount}
             />
-            <LearningLanguageCard language={profile.currentLanguage} />
+            <LearningLanguageCard language={currentLanguage} />
           </div>
 
           {/* Right Column */}
           <div className="flex flex-col gap-6">
-            <DailyGoalCard goal={profile.dailyGoal} />
-            <AchievementsSection achievements={profile.achievements} />
-            <RecentActivity activity={profile.recentActivity} />
+            <ProfileQuests />
+            <ProfileAchievements />
+            <RecentActivity />
           </div>
         </div>
 

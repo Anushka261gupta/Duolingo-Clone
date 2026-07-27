@@ -2,15 +2,16 @@ import { useState, useEffect, useMemo } from "react"
 import { useXP } from "@/providers/xp-provider"
 import { useGems } from "@/providers/gems-provider"
 import { useStreak } from "@/providers/streak-provider"
+import { useProgress } from "@/hooks/use-progress"
 import { ACHIEVEMENT_REWARDS } from "@/domain/constants/rewards"
 import { Flame, Award } from "lucide-react"
 
 export function useAchievementEngine() {
   const { totalXP } = useXP()
-  const { addGems } = useGems()
+  const { addGems, gems } = useGems()
   const { currentStreak } = useStreak()
+  const { completedLessonCount: completedLessons } = useProgress()
   const [claims, setClaims] = useState<Record<string, string>>({})
-  const [completedLessons, setCompletedLessons] = useState(0)
   const [isLoaded, setIsLoaded] = useState(false)
 
   useEffect(() => {
@@ -23,25 +24,21 @@ export function useAchievementEngine() {
       }
     }
 
-    const savedLessons = localStorage.getItem("completedLessons")
-    if (savedLessons) {
-      try {
-        const parsed = JSON.parse(savedLessons)
-        setCompletedLessons(Array.isArray(parsed) ? parsed.length : 0)
-      } catch (e) {
-        setCompletedLessons(0)
-      }
-    }
-
     setIsLoaded(true)
   }, [])
 
   const claimReward = (id: string, amount: number) => {
     if (claims[id]) return
+    
+    console.log("Before claim: Current Gems", gems)
+    console.log("Reward Amount", amount)
+
     const newClaims = { ...claims, [id]: new Date().toISOString() }
     setClaims(newClaims)
     localStorage.setItem("achievement_claims", JSON.stringify(newClaims))
     addGems(amount)
+    
+    console.log("After addGems(): Updated Gems", gems + amount)
   }
 
   const getStatus = (id: string, current: number, target: number) => {

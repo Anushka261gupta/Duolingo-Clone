@@ -8,7 +8,9 @@ import { HeartsProvider } from '@/providers/hearts-provider'
 import { XPProvider } from '@/providers/xp-provider'
 import { GemsProvider } from '@/providers/gems-provider'
 import { StreakProvider } from '@/providers/streak-provider'
-import { FloatingXPOverlay, AchievementToastOverlay } from "@/components/shared"
+import { DoubleXPProvider } from '@/providers/double-xp-provider'
+import { ActivityProvider } from '@/providers/activity-provider'
+import { AchievementToastOverlay, ToastOverlay } from "@/components/shared"
 
 import './globals.css'
 
@@ -61,12 +63,16 @@ export default function RootLayout({
           <GemsProvider>
             <StreakProvider>
               <HeartsProvider>
-                <XPProvider>
-                  {children}
-                  <FloatingXPOverlay />
-                  <AchievementToastOverlay />
-                  {process.env.NODE_ENV === 'production' && <Analytics />}
-                </XPProvider>
+                <DoubleXPProvider>
+                  <XPProvider>
+                    <ActivityProvider>
+                      {children}
+                      <AchievementToastOverlay />
+                      <ToastOverlay />
+                      {process.env.NODE_ENV === 'production' && <Analytics />}
+                    </ActivityProvider>
+                  </XPProvider>
+                </DoubleXPProvider>
               </HeartsProvider>
             </StreakProvider>
           </GemsProvider>

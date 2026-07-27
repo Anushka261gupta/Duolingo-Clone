@@ -1,0 +1,6 @@
+export const PRACTICE_CONFIG = {
+  QUESTION_COUNT: 5,
+  QUESTION_XP: 2,
+  COMPLETION_XP: 5,
+  HEART_REWARD: 1
+} as const

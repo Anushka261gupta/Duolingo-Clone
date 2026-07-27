@@ -2,17 +2,18 @@
 
 import { MainContent } from "@/components/layout"
 import { useShop } from "@/hooks/use-shop"
+import { useGems } from "@/providers/gems-provider"
 import {
   ShopLoading,
   ShopEmptyState,
   ShopHeader,
-  SuperCard,
-  FeaturedOffers,
   ShopSection
 } from "@/components/features/shop"
+import { SHOP_CATEGORIES } from "@/domain/constants/shop"
 
 export default function ShopPage() {
-  const { data, isLoading, isEmpty } = useShop()
+  const { sections, isLoading, isEmpty } = useShop()
+  const { gems } = useGems()
 
   if (isLoading) {
     return (
@@ -22,7 +23,7 @@ export default function ShopPage() {
     )
   }
 
-  if (isEmpty || !data) {
+  if (isEmpty || !sections) {
     return (
       <MainContent>
         <ShopEmptyState />
@@ -33,26 +34,14 @@ export default function ShopPage() {
   return (
     <MainContent>
       <div className="flex flex-col pb-24">
-        <ShopHeader gemBalance={data.gemBalance} />
-        
-        {/* Featured / Super Duolingo Section */}
-        {data.sections.super && data.sections.super.items.length > 0 && (
-          <SuperCard item={data.sections.super.items[0]} />
-        )}
-        
-        {/* Featured Offer */}
-        {data.featuredOffer && (
-          <FeaturedOffers offer={data.featuredOffer} />
-        )}
+        <ShopHeader gemBalance={gems} />
 
-        {/* Hearts Section */}
-        <ShopSection section={data.sections.hearts} />
-
-        {/* Power-Ups Section */}
-        <ShopSection section={data.sections.powerups} />
-
-        {/* Gems Section */}
-        <ShopSection section={data.sections.gems} />
+        {sections.map(sectionData => (
+          <ShopSection 
+            key={sectionData.id} 
+            section={sectionData} 
+          />
+        ))}
       </div>
     </MainContent>
   )

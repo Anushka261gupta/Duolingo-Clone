@@ -1,36 +1,57 @@
 import { Gem } from "lucide-react"
+import { ShopItemStatus } from "@/hooks/use-shop"
 
 interface PurchaseButtonProps {
-  itemId: string
-  status: "locked" | "available" | "purchased"
+  status: ShopItemStatus
   priceAmount?: number
   priceText?: string
   currencyType?: "gems" | "fiat"
+  isActivatable?: boolean
+  isActive?: boolean
+  onClick: () => void
 }
 
 export function PurchaseButton({
-  itemId,
   status,
   priceAmount,
   priceText,
-  currencyType
+  currencyType,
+  isActivatable,
+  isActive,
+  onClick
 }: PurchaseButtonProps) {
   const isLocked = status === "locked"
-  const isPurchased = status === "purchased"
+  const isOwned = status === "owned"
 
   const handleClick = () => {
-    if (isLocked || isPurchased) return
-    
-    // TODO: FUTURE API INTEGRATION
-    // 1. Open purchase confirmation modal here
-    // 2. On confirm, call useShop().purchaseItem(itemId)
-    console.log(`Initiated purchase for ${itemId}`)
+    if (isLocked) return
+    if (isOwned && !isActivatable) return
+    onClick()
   }
 
-  if (isPurchased) {
+  if (isActive) {
     return (
       <div className="flex w-full items-center justify-center rounded-xl border-2 border-duo-gray-light bg-duo-gray-lighter px-4 py-3 font-extrabold text-duo-gray uppercase md:w-auto">
-        Equipped
+        Active
+      </div>
+    )
+  }
+
+  if (isActivatable) {
+    return (
+      <button 
+        onClick={handleClick}
+        className="flex w-full items-center justify-center gap-2 rounded-xl bg-duo-blue px-4 py-3 font-extrabold uppercase tracking-wide text-white transition-opacity hover:opacity-80 active:opacity-100 shadow-[0_4px_0_0_#1cb0f6] md:w-auto md:min-w-[120px]"
+      >
+        <span>Activate</span>
+      </button>
+    )
+  }
+
+  if (isOwned) {
+    return (
+      <div className="flex w-full items-center justify-center rounded-xl border-2 border-duo-gray-light bg-duo-gray-lighter px-4 py-3 font-extrabold text-duo-gray uppercase md:w-auto">
+        Owned
       </div>
     )
   }

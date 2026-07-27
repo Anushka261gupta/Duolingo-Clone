@@ -13,9 +13,10 @@ import { useHearts } from "@/providers/hearts-provider"
 
 interface LessonViewProps {
   lessonId: string
+  mode?: "learn" | "practice"
 }
 
-export function LessonView({ lessonId }: LessonViewProps) {
+export function LessonView({ lessonId, mode = "learn" }: LessonViewProps) {
   const router = useRouter()
   const {
     currentQuestion,
@@ -29,7 +30,7 @@ export function LessonView({ lessonId }: LessonViewProps) {
     selectAnswer,
     submitAnswer,
     nextQuestion,
-  } = useLesson(lessonId)
+  } = useLesson(lessonId, mode)
 
   useEffect(() => {
     if (lessonCompleted) {
@@ -46,7 +47,7 @@ export function LessonView({ lessonId }: LessonViewProps) {
 
   if (!currentQuestion) return null
   if (lessonCompleted) return null
-  if (gameOver || (hasMounted && isOutOfHearts && currentIndex === 0 && questionStatus === "idle")) {
+  if (gameOver || (hasMounted && isOutOfHearts && currentIndex === 0 && questionStatus === "idle" && mode !== "practice")) {
     return <OutOfHearts />
   }
   let answerState: "idle" | "selected" | "correct" | "incorrect" = "idle"

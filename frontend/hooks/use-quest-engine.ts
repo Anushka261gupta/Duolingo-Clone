@@ -3,10 +3,12 @@ import { useXP } from "@/providers/xp-provider"
 import { useGems } from "@/providers/gems-provider"
 import { QUEST_CONFIG } from "@/domain/constants/quests"
 import type { Quest, Challenge } from "@/domain/types"
+import { useToast } from "@/hooks/use-toast"
 
 export function useQuestEngine() {
   const { dailyXP, weeklyXP, monthlyXP } = useXP()
-  const { addGems } = useGems()
+  const { addGems, gems } = useGems()
+  const { notify } = useToast()
   const [claims, setClaims] = useState<Record<string, string>>({})
   const [isLoaded, setIsLoaded] = useState(false)
 
@@ -25,6 +27,9 @@ export function useQuestEngine() {
   const claimReward = (questId: string, rewardAmount: number) => {
     if (claims[questId]) return
 
+    console.log("Before claim: Current Gems", gems)
+    console.log("Reward Amount", rewardAmount)
+
     const newClaims = {
       ...claims,
       [questId]: new Date().toISOString()
@@ -32,6 +37,24 @@ export function useQuestEngine() {
     setClaims(newClaims)
     localStorage.setItem("quest_claims", JSON.stringify(newClaims))
     addGems(rewardAmount)
+    
+    notify({
+      title: "Reward Claimed!",
+      description: `You earned ${rewardAmount} gems!`,
+      icon: "💎",
+      type: "success"
+    })
+    
+    window.dispatchEvent(
+      new CustomEvent("log-activity", {
+        detail: {
+          type: "QUEST_CLAIMED",
+          metadata: { questId }
+        }
+      })
+    )
+
+    console.log("After addGems(): Updated Gems", gems + rewardAmount)
   }
 
   const getStatus = (questId: string, current: number, target: number): Quest["status"] => {

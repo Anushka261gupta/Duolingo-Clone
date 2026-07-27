@@ -45,9 +45,9 @@ export default function QuestsPage() {
         
         <DailyQuests quests={dailyQuestsList} onClaim={(id) => claimQuest(id, dailyQuest.reward?.amount || 10)} />
         
-        <WeeklyChallenge challenge={weeklyChallenge} onClaim={(id) => claimQuest(id, weeklyChallenge.rewardAmount)} />
+        <WeeklyChallenge challenge={weeklyChallenge} onClaim={(id) => claimQuest(id, weeklyChallenge.reward?.amount || 50)} />
         
-        <MonthlyChallenge challenge={monthlyChallenge} onClaim={(id) => claimQuest(id, monthlyChallenge.rewardAmount)} />
+        <MonthlyChallenge challenge={monthlyChallenge} onClaim={(id) => claimQuest(id, monthlyChallenge.reward?.amount || 100)} />
         
         <AchievementProgress achievements={achievements} onClaim={(id, amount) => claimAchievement(id, amount)} />
       </div>

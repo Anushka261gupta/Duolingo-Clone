@@ -1,29 +1,32 @@
 import { useState, useEffect } from "react"
-import { QuestionStatus, LessonMetadata, UserAnswer } from "@/domain/types/lesson-engine"
+import { QuestionStatus, LessonMetadata, UserAnswer, LessonQuestion } from "@/domain/types/lesson-engine"
 import { MOCK_LESSONS } from "@/data/lesson-engine"
 import { validateExerciseAnswer } from "@/domain/utils/exercise-validators"
 import { useHearts } from "@/providers/hearts-provider"
 import { useXP } from "@/providers/xp-provider"
+import { useDoubleXP } from "@/providers/double-xp-provider"
 import { XP_REWARDS } from "@/domain/constants/xp"
+import { PRACTICE_CONFIG } from "@/domain/constants/practice"
 import { useStreak } from "@/providers/streak-provider"
+import { usePractice } from "@/hooks/use-practice"
+import { useProgress } from "@/hooks/use-progress"
 
-export function useLesson(lessonId: string) {
-  const { loseHeart, isOutOfHearts, hearts } = useHearts()
+export function useLesson(lessonId: string, mode: "learn" | "practice" = "learn") {
+  const { loseHeart, isOutOfHearts, hearts, restoreHeart, maxHearts } = useHearts()
   const { addXP, commitLessonRewards, resetLessonXP, currentLessonXP } = useXP()
+  const { isDoubleXPActive } = useDoubleXP()
   const { completeLesson } = useStreak()
+  const { generatedLesson } = usePractice()
+  const { markLessonCompleted, markPracticeCompleted } = useProgress()
   
   useEffect(() => {
     resetLessonXP()
-  }, [lessonId])
+  }, [lessonId, mode])
 
   // Fallback to "fallback-lesson" only if the requested lesson doesn't exist
-  const lessonData = MOCK_LESSONS[lessonId] || MOCK_LESSONS["fallback-lesson"]
-  
-  if (!MOCK_LESSONS[lessonId]) {
-    console.warn(`[useLesson] Warning: Invalid lessonId "${lessonId}". Using fallback lesson.`)
-  } else {
-    console.log(`[useLesson] Successfully loaded lessonData for: ${lessonId}`)
-  }
+  const lessonData = mode === "practice" 
+    ? generatedLesson 
+    : (MOCK_LESSONS[lessonId] || MOCK_LESSONS["fallback-lesson"])
   
   const [currentIndex, setCurrentIndex] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState<UserAnswer>(null)
@@ -55,11 +58,33 @@ export function useLesson(lessonId: string) {
 
     if (correct) {
       setCorrectCount(prev => prev + 1)
-      const xp = XP_REWARDS.EXERCISE_BASE[currentQuestion.type] || 5
-      addXP(xp)
+      const baseRaw = mode === "practice" ? PRACTICE_CONFIG.QUESTION_XP : (XP_REWARDS.EXERCISE_BASE[currentQuestion.type] || 5)
+      const xp = isDoubleXPActive ? baseRaw * 2 : baseRaw
+      addXP(xp, isDoubleXPActive)
+      
+      // If practice mode and correct, we can remove it from mistakes
+      if (mode === "practice") {
+        try {
+          const storedMistakes = localStorage.getItem("mistakes_history")
+          if (storedMistakes) {
+            const mistakes: LessonQuestion[] = JSON.parse(storedMistakes)
+            const filtered = mistakes.filter(m => m.id !== currentQuestion.id)
+            localStorage.setItem("mistakes_history", JSON.stringify(filtered))
+          }
+        } catch(e) {}
+      }
     } else {
       setIncorrectCount(prev => prev + 1)
-      loseHeart()
+      if (mode === "learn") {
+        loseHeart()
+        // Record mistake for future practice
+        try {
+          const storedMistakes = localStorage.getItem("mistakes_history")
+          const mistakes: LessonQuestion[] = storedMistakes ? JSON.parse(storedMistakes) : []
+          mistakes.push(currentQuestion)
+          localStorage.setItem("mistakes_history", JSON.stringify(mistakes))
+        } catch(e) {}
+      }
     }
 
     setIsCorrect(correct)
@@ -67,7 +92,7 @@ export function useLesson(lessonId: string) {
   }
 
   const nextQuestion = () => {
-    if (isOutOfHearts) {
+    if (mode === "learn" && isOutOfHearts) {
       setGameOver(true)
       return
     }
@@ -81,12 +106,16 @@ export function useLesson(lessonId: string) {
       // Update the global streak
       completeLesson()
       
-      // Save completed lesson to localStorage
-      const storedLessons = localStorage.getItem("completedLessons")
-      const completed = storedLessons ? JSON.parse(storedLessons) : []
-      if (!completed.includes(lessonId)) {
-        completed.push(lessonId)
-        localStorage.setItem("completedLessons", JSON.stringify(completed))
+      let restoredHeart = false
+
+      if (mode === "learn") {
+        markLessonCompleted(lessonId)
+      } else if (mode === "practice") {
+        if (hearts < maxHearts) {
+           restoreHeart()
+           restoredHeart = true
+        }
+        markPracticeCompleted()
       }
       
       // Save lesson metadata
@@ -94,23 +123,35 @@ export function useLesson(lessonId: string) {
       const metadataDict = storedMetadata ? JSON.parse(storedMetadata) : {}
       
       const isPerfect = incorrectCount === 0
-      const base = XP_REWARDS.LESSON_COMPLETE_BASE
-      const perfectBonus = isPerfect ? XP_REWARDS.PERFECT_LESSON_BONUS : 0
+      
+      const baseRaw = mode === "practice" ? PRACTICE_CONFIG.COMPLETION_XP : XP_REWARDS.LESSON_COMPLETE_BASE
+      const perfectBonusRaw = (mode === "practice" || !isPerfect) ? 0 : XP_REWARDS.PERFECT_LESSON_BONUS
+      
+      const base = isDoubleXPActive ? baseRaw * 2 : baseRaw
+      const perfectBonus = isDoubleXPActive ? perfectBonusRaw * 2 : perfectBonusRaw
       
       commitLessonRewards({ base, perfectBonus })
       const finalXP = currentLessonXP + base + perfectBonus
 
       const newMetadata: LessonMetadata = {
-        lessonId,
+        lessonId: mode === "practice" ? "practice-lesson" : lessonId,
         completedAt: new Date().toISOString(),
         accuracy: correctCount / lessonData.questions.length,
-        heartsRemaining: hearts, 
+        heartsRemaining: hearts + (restoredHeart ? 1 : 0), 
         xpEarned: finalXP,
+        xpBreakdown: {
+          baseLesson: baseRaw + perfectBonusRaw,
+          exercise: currentLessonXP / (isDoubleXPActive ? 2 : 1),
+          doubleXpBonus: isDoubleXPActive ? ((currentLessonXP / 2) + baseRaw + perfectBonusRaw) : 0,
+          total: finalXP
+        },
         correctAnswers: correctCount,
-        incorrectAnswers: incorrectCount
+        incorrectAnswers: incorrectCount,
+        mode,
+        restoredHeart
       }
       
-      metadataDict[lessonId] = newMetadata
+      metadataDict[newMetadata.lessonId] = newMetadata
       localStorage.setItem("lessonMetadata", JSON.stringify(metadataDict))
       
       return

@@ -15,7 +15,7 @@ export function StatisticsGrid({ stats }: StatisticsGridProps) {
   return (
     <div className="grid grid-cols-2 gap-4">
       {stats.map((stat, i) => (
-        <div key={i} className="rounded-2xl border-2 border-duo-gray-light p-4">
+        <div key={i} className="rounded-2xl border-2 border-duo-gray-light p-4" title={stat.description}>
           <StatBadge
             icon={stat.icon}
             value={stat.value}

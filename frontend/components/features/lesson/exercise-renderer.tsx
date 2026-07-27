@@ -4,6 +4,7 @@ import { WordBankExercise } from "./word-bank-exercise"
 import { TypeAnswerExercise } from "./type-answer-exercise"
 import { TranslateExercise } from "./translate-exercise"
 import { ListeningExercise } from "./listening-exercise"
+import { MatchPairsExercise } from "./match-pairs-exercise"
 
 interface ExerciseRendererProps {
   exercise: LessonQuestion
@@ -19,6 +20,7 @@ const registry: Record<string, React.FC<any>> = {
   TYPE_ANSWER: TypeAnswerExercise,
   TRANSLATE: TranslateExercise,
   LISTENING: ListeningExercise,
+  MATCH_PAIRS: MatchPairsExercise,
 }
 
 export function ExerciseRenderer({ exercise, selectedAnswer, answerState, onSelect }: ExerciseRendererProps) {

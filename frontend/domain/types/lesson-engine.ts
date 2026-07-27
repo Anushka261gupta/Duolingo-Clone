@@ -44,12 +44,25 @@ export interface ListeningPayload {
   incorrectFeedback: string
 }
 
+export interface MatchPair {
+  id: string
+  left: string
+  right: string
+}
+
+export interface MatchPairsPayload {
+  pairs: MatchPair[]
+  correctFeedback: string
+  incorrectFeedback: string
+}
+
 export type LessonExercisePayload =
   | { type: "MULTIPLE_CHOICE"; payload: MultipleChoicePayload }
   | { type: "WORD_BANK"; payload: WordBankPayload }
   | { type: "TYPE_ANSWER"; payload: TypeAnswerPayload }
   | { type: "TRANSLATE"; payload: TranslatePayload }
   | { type: "LISTENING"; payload: ListeningPayload }
+  | { type: "MATCH_PAIRS"; payload: MatchPairsPayload }
 
 export type LessonQuestion = {
   id: string
@@ -68,6 +81,14 @@ export interface LessonMetadata {
   accuracy: number
   heartsRemaining: number
   xpEarned: number
+  xpBreakdown?: {
+    baseLesson: number
+    exercise: number
+    doubleXpBonus: number
+    total: number
+  }
   correctAnswers: number
   incorrectAnswers: number
+  mode?: "learn" | "practice"
+  restoredHeart?: boolean
 }

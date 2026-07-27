@@ -43,15 +43,26 @@ export function LessonCompleteView() {
         <div className="mb-8 flex flex-col items-center gap-6 text-center">
           <IllustrationPlaceholder />
           <div>
-            <h1 className="text-3xl font-extrabold text-duo-ink sm:text-4xl">Lesson Complete!</h1>
+            <h1 className="text-3xl font-extrabold text-duo-ink sm:text-4xl">
+              {metadata.mode === "practice" ? "Practice Complete!" : "Lesson Complete!"}
+            </h1>
             <p className="mt-2 text-base font-semibold text-duo-gray">
-              Great work! You&apos;re one step closer to fluency.
+              {metadata.mode === "practice" 
+                ? "Great practice! You're solidifying your skills."
+                : "Great work! You're one step closer to fluency."}
             </p>
           </div>
         </div>
 
+        {metadata.restoredHeart && (
+          <div className="mb-6 mx-auto flex w-full max-w-sm items-center justify-center gap-3 rounded-2xl border-2 border-[#ff4b4b] bg-[#ff4b4b]/10 py-4 px-6 text-[#ff4b4b]">
+            <span className="text-2xl">❤️</span>
+            <span className="text-xl font-extrabold">+1 Heart Restored</span>
+          </div>
+        )}
+
         <div className="flex flex-col gap-4">
-          <XpAwardCard xpEarned={metadata.xpEarned} />
+          <XpAwardCard xpEarned={metadata.xpEarned} breakdown={metadata.xpBreakdown} />
           <StatsGrid
             accuracy={displayAccuracy}
             heartsRemaining={metadata.heartsRemaining}

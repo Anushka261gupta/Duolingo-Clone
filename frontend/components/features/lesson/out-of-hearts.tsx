@@ -17,16 +17,20 @@ export function OutOfHearts() {
       </div>
 
       <div className="w-full flex flex-col gap-4 mt-8">
-        <Button variant="secondary" className="w-full h-14 uppercase text-base font-bold disabled:opacity-50" disabled>
-          Practice to Earn (Coming Soon)
+        <Button variant="secondary" className="w-full h-14 uppercase text-base font-bold text-[#1cb0f6] border-[#1cb0f6]" asChild>
+          <Link href="/practice">
+            Practice for Hearts
+          </Link>
         </Button>
         
-        <Button variant="secondary" className="w-full h-14 uppercase text-base font-bold disabled:opacity-50" disabled>
-          Go to Shop (Coming Soon)
+        <Button variant="secondary" className="w-full h-14 uppercase text-base font-bold" asChild>
+          <Link href="/shop">
+            Go to Shop
+          </Link>
         </Button>
         
         <Button className="w-full h-14 uppercase text-base font-bold" asChild>
-          <Link href="/learn">
+          <Link href="/">
             Return to Learn
           </Link>
         </Button>

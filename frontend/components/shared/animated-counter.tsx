@@ -9,10 +9,17 @@ interface AnimatedCounterProps {
 }
 
 export function AnimatedCounter({ value, durationMs = 1000, className, startFromZero = false }: AnimatedCounterProps) {
-  const [displayValue, setDisplayValue] = useState(startFromZero ? 0 : value)
+  const isValid = typeof value === "number" && Number.isFinite(value) && !isNaN(value)
+  const lastValidRef = useRef(startFromZero ? 0 : (isValid ? value : 0))
+  if (isValid) {
+    lastValidRef.current = value
+  }
+  const safeValue = isValid ? value : lastValidRef.current
+
+  const [displayValue, setDisplayValue] = useState(startFromZero ? 0 : safeValue)
   
   const hasMounted = useRef(false)
-  const displayValueRef = useRef(startFromZero ? 0 : value)
+  const displayValueRef = useRef(startFromZero ? 0 : safeValue)
 
   useEffect(() => {
     if (!hasMounted.current) {
@@ -20,7 +27,7 @@ export function AnimatedCounter({ value, durationMs = 1000, className, startFrom
       if (!startFromZero) return
     }
 
-    if (displayValueRef.current === value) return
+    if (displayValueRef.current === safeValue) return
 
     let startTimestamp: number | null = null
     const startValue = displayValueRef.current
@@ -31,7 +38,7 @@ export function AnimatedCounter({ value, durationMs = 1000, className, startFrom
       const progress = Math.min((timestamp - startTimestamp) / durationMs, 1)
       
       const easeOutQuart = 1 - Math.pow(1 - progress, 4)
-      const current = Math.floor(startValue + (value - startValue) * easeOutQuart)
+      const current = Math.floor(startValue + (safeValue - startValue) * easeOutQuart)
       
       setDisplayValue(current)
       displayValueRef.current = current
@@ -39,8 +46,8 @@ export function AnimatedCounter({ value, durationMs = 1000, className, startFrom
       if (progress < 1) {
         animationFrameId = window.requestAnimationFrame(step)
       } else {
-        setDisplayValue(value)
-        displayValueRef.current = value
+        setDisplayValue(safeValue)
+        displayValueRef.current = safeValue
       }
     }
     
@@ -49,7 +56,7 @@ export function AnimatedCounter({ value, durationMs = 1000, className, startFrom
     return () => {
       if (animationFrameId) window.cancelAnimationFrame(animationFrameId)
     }
-  }, [value, durationMs, startFromZero])
+  }, [safeValue, durationMs, startFromZero])
 
   return <span className={className}>{displayValue}</span>
 }

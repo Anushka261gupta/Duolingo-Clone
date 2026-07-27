@@ -27,49 +27,57 @@ export function ProfileStats({
       label: "Day streak",
       value: streak,
       icon: <Flame className="size-6 fill-duo-gold text-duo-gold" strokeWidth={0} />,
-      color: "text-duo-gold"
+      color: "text-duo-gold",
+      description: "Consecutive days you've completed a lesson."
     },
     {
       label: "Longest streak",
       value: longestStreak,
       icon: <Flame className="size-6 text-duo-gold" strokeWidth={2.5} />,
-      color: "text-duo-gold"
+      color: "text-duo-gold",
+      description: "Your all-time longest streak."
     },
     {
       label: "Total XP",
       value: totalXp,
       icon: <Zap className="size-6 fill-duo-gold text-duo-gold" strokeWidth={0} />,
-      color: "text-duo-gold"
+      color: "text-duo-gold",
+      description: "Total experience points earned."
     },
     {
       label: "Days active",
       value: daysActive,
       icon: <Calendar className="size-6 text-duo-blue" strokeWidth={2.5} />,
-      color: "text-duo-blue"
+      color: "text-duo-blue",
+      description: "Total unique days you've been active."
     },
     {
       label: "Hearts",
       value: hearts,
       icon: <div className="text-xl">❤️</div>,
-      color: "text-red-500"
+      color: "text-red-500",
+      description: "Remaining hearts. You lose a heart for each mistake."
     },
     {
       label: "Gems",
       value: gems,
       icon: <div className="text-xl">💎</div>,
-      color: "text-sky-500"
+      color: "text-sky-500",
+      description: "In-game currency to buy items in the shop."
     },
     {
       label: "Lessons completed",
       value: completedLessons,
       icon: <div className="text-xl">📚</div>,
-      color: "text-emerald-500"
+      color: "text-emerald-500",
+      description: "Total number of lessons you have completed."
     },
     {
       label: "Units completed",
       value: completedUnits,
       icon: <div className="text-xl">🏆</div>,
-      color: "text-yellow-500"
+      color: "text-yellow-500",
+      description: "Total number of units you have fully completed."
     }
   ]
 
