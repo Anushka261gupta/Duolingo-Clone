@@ -30,9 +30,9 @@ export function ProfileAchievements() {
                 <p className="mb-2 text-sm text-duo-gray">{achievement.description}</p>
                 <ProgressBar
                   current={achievement.current}
-                  target={achievement.total}
+                  target={achievement.target}
                   fillClassName="bg-duo-gold"
-                  label={achievement.status === "completed" ? "Completed ✓" : `${achievement.current} / ${achievement.total}`}
+                  label={achievement.status === "completed" ? "Completed ✓" : `${achievement.current} / ${achievement.target}`}
                 />
               </div>
             </div>

@@ -1,20 +1,19 @@
 import { useState, useEffect, useMemo } from "react"
-import { WeeklyLeaderboard } from "@/domain/types"
-import { MOCK_WEEKLY_LEADERBOARD } from "@/data/leaderboard"
 import { useXP } from "@/providers/xp-provider"
+import { useLeaderboardData } from "./use-leaderboard-data"
 
 export function useLeaderboard() {
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<Error | null>(null)
+  const { data: fetchedData, isLoading: isFetching, error: fetchError } = useLeaderboardData()
   const { weeklyXP } = useXP()
 
   const data = useMemo(() => {
-    // Inject live weeklyXP into the current user's entry (mock user has you: true)
+    if (!fetchedData) return null
+    // Inject live weeklyXP into the current user's entry (demo user has you: true)
     const mergedData = {
-      ...MOCK_WEEKLY_LEADERBOARD,
-      entries: [...MOCK_WEEKLY_LEADERBOARD.entries].map(entry => 
+      ...fetchedData,
+      entries: [...fetchedData.entries].map(entry => 
         entry.you ? { ...entry, xp: weeklyXP } : entry
-      ).sort((a, b) => b.xp - a.xp)
+      ).sort((a: any, b: any) => b.xp - a.xp)
     }
     
     mergedData.entries = mergedData.entries.map((entry, index) => ({
@@ -23,19 +22,12 @@ export function useLeaderboard() {
     }))
 
     return mergedData
-  }, [weeklyXP])
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 1000)
-    return () => clearTimeout(timer)
-  }, [])
+  }, [fetchedData, weeklyXP])
 
   return {
     data,
-    isLoading,
-    isEmpty: !isLoading && (!data || data.entries.length === 0),
-    error
+    isLoading: isFetching,
+    isEmpty: !isFetching && (!data || data.entries.length === 0),
+    error: fetchError
   }
 }

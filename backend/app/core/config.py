@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     app_name: str = "Duolingo Clone API"
     debug: bool = True
     database_url: str = "sqlite:///./duolingo.db"
+    secret_key: str = "supersecretkey_change_in_production"
     cors_origins: list[str] = ["http://localhost:3000"]
 
 

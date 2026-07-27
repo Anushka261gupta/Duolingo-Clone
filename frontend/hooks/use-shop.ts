@@ -1,11 +1,12 @@
 "use client"
 import { useState, useEffect, useMemo } from "react"
-import { SHOP_ITEMS, SHOP_CATEGORIES, ShopItemDef, ShopCategory } from "@/domain/constants/shop"
+import { SHOP_CATEGORIES, ShopItemDef, ShopCategory } from "@/domain/constants/shop"
 import { useGems } from "@/providers/gems-provider"
 import { useHearts } from "@/providers/hearts-provider"
 import { useStreak } from "@/providers/streak-provider"
 import { useDoubleXP } from "@/providers/double-xp-provider"
 import { useToast } from "@/hooks/use-toast"
+import { useShopCatalog } from "./use-shop-catalog"
 
 export type ShopItemStatus = "available" | "locked" | "owned"
 
@@ -28,6 +29,8 @@ export function useShop() {
   const { currentStreak, repairStreak } = useStreak()
   const { isDoubleXPActive } = useDoubleXP()
   const { notify } = useToast()
+
+  const { data: SHOP_ITEMS, isLoading: isCatalogLoading } = useShopCatalog()
 
   const [inventory, setInventory] = useState<InventoryItem[]>([])
   const [isLoaded, setIsLoaded] = useState(false)
@@ -74,8 +77,9 @@ export function useShop() {
   }
 
   const sections = useMemo(() => {
+    if (!SHOP_ITEMS) return []
     return SHOP_CATEGORIES.map(category => {
-      const items = SHOP_ITEMS.filter(item => item.category === category.id).map(item => {
+      const items = SHOP_ITEMS.filter((item: any) => item.category === category.id).map((item: any) => {
         let status: ShopItemStatus = "available"
         const ownedInstance = inventory.find(i => i.itemId === item.id && i.status === "owned")
         

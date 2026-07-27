@@ -20,7 +20,7 @@ import { useGems } from "@/providers/gems-provider"
 import { useHearts } from "@/providers/hearts-provider"
 import { useProgress } from "@/hooks/use-progress"
 import { useLeaderboard } from "@/hooks/use-leaderboard"
-import { mockUserProfile } from "@/data/profile"
+import { useDemoUser } from "@/hooks/use-demo-user"
 
 export default function ProfilePage() {
   const { user, isLoading: authLoading, logout } = useAuthContext()
@@ -30,9 +30,10 @@ export default function ProfilePage() {
   const { hearts } = useHearts()
   const { completedLessonCount, completedUnitCount } = useProgress()
   const { data: leaderboardData } = useLeaderboard()
+  const { data: profileData, isLoading: profileLoading } = useDemoUser()
   const [isLogoutOpen, setIsLogoutOpen] = useState(false)
 
-  if (authLoading) {
+  if (authLoading || profileLoading) {
     return (
       <MainContent>
         <div className="flex h-[50vh] items-center justify-center">
@@ -43,11 +44,11 @@ export default function ProfilePage() {
   }
 
   // Graceful fallback if auth context is not available yet
-  const displayName = user?.name || mockUserProfile.displayName
-  const username = user?.username || mockUserProfile.username
-  const avatarUrl = user?.avatar || mockUserProfile.avatarUrl
-  const joinDate = mockUserProfile.joinDate // Auth context might not provide join date initially
-  const currentLanguage = mockUserProfile.currentLanguage
+  const displayName = user?.name || profileData.displayName || profileData.name
+  const username = user?.username || profileData.username
+  const avatarUrl = user?.avatar || profileData.avatarUrl
+  const joinDate = profileData.joinDate
+  const currentLanguage = profileData.currentLanguage
   const leagueName = leaderboardData?.league?.name
 
   return (

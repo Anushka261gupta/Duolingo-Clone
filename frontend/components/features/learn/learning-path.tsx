@@ -5,8 +5,8 @@ import Image from "next/image"
 import { usePathname } from "next/navigation"
 
 import { offsetFor } from "@/domain/constants/path-offsets"
-import { MOCK_UNITS } from "@/data/units"
 import { MOCK_LESSONS } from "@/data/lesson-engine"
+import { useCourse } from "@/hooks/use-course"
 
 import { LessonNode } from "./lesson-node"
 import { UnitBanner } from "./unit-banner"
@@ -14,6 +14,8 @@ import { UnitBanner } from "./unit-banner"
 export function LearningPath() {
   const [completedLessons, setCompletedLessons] = useState<string[]>([])
   const pathname = usePathname()
+  
+  const { data: units, isLoading } = useCourse("course-spanish")
 
   useEffect(() => {
     const stored = localStorage.getItem("completedLessons")
@@ -24,9 +26,13 @@ export function LearningPath() {
 
   let firstUncompletedFound = false
 
+  if (isLoading) {
+    return <div className="flex justify-center p-8 text-muted-foreground">Loading course...</div>
+  }
+
   return (
     <div className="flex flex-col gap-6">
-      {MOCK_UNITS.map((unit, ui) => (
+      {units.map((unit, ui) => (
         <section key={`${unit.unit}-${ui}`} className="flex flex-col gap-2">
           <UnitBanner
             section={unit.section}

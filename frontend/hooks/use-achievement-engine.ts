@@ -4,7 +4,7 @@ import { useGems } from "@/providers/gems-provider"
 import { useStreak } from "@/providers/streak-provider"
 import { useProgress } from "@/hooks/use-progress"
 import { ACHIEVEMENT_REWARDS } from "@/domain/constants/rewards"
-import { Flame, Award } from "lucide-react"
+import { Flame, Bird, Book } from "lucide-react"
 
 export function useAchievementEngine() {
   const { totalXP } = useXP()
@@ -58,7 +58,8 @@ export function useAchievementEngine() {
         current: Math.min(currentStreak, 30),
         target: 30,
         status: getStatus("ach-wildfire", currentStreak, 30),
-        reward: { type: "gems", amount: ACHIEVEMENT_REWARDS.WILDFIRE, icon: Flame }
+        reward: { type: "gems", amount: ACHIEVEMENT_REWARDS.WILDFIRE },
+        icon: Flame
       },
       {
         id: "ach-sage",
@@ -67,7 +68,8 @@ export function useAchievementEngine() {
         current: Math.min(totalXP, 1000),
         target: 1000,
         status: getStatus("ach-sage", totalXP, 1000),
-        reward: { type: "gems", amount: ACHIEVEMENT_REWARDS.SAGE, icon: Award }
+        reward: { type: "gems", amount: ACHIEVEMENT_REWARDS.SAGE },
+        icon: Bird
       },
       {
         id: "ach-scholar",
@@ -76,7 +78,8 @@ export function useAchievementEngine() {
         current: Math.min(completedLessons, 50),
         target: 50,
         status: getStatus("ach-scholar", completedLessons, 50),
-        reward: { type: "gems", amount: ACHIEVEMENT_REWARDS.SCHOLAR, icon: Award }
+        reward: { type: "gems", amount: ACHIEVEMENT_REWARDS.SCHOLAR },
+        icon: Book
       }
     ]
   }, [totalXP, completedLessons, currentStreak, claims, isLoaded])
