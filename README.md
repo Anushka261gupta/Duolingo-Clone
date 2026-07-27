@@ -335,7 +335,7 @@ http://localhost:8000/docs
 
 ## 🏠 Home Page
 
-![Home Page](./screenshots/Homepage.png)
+![Home Page](./Screenshot/Homepage.png)
 
 ---
 
